@@ -12,10 +12,11 @@ class User(Base):
     name = Column(String(100), nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     password_hash = Column(String(256), nullable=False)
-    phone = Column(String(20))
+    contact_info = Column(String(20))
     role = Column(String(20), nullable=False)
-    preferences = Column(JSON)  # Use JSONB if you're using PostgreSQL
     created_at = Column(DateTime, server_default=func.now())
+    location = Column(Text, nullable=False)
+    type = Column(String(50), nullable=False)  # e.g., 'provider', 'receiver'
 
     __table_args__ = (
         CheckConstraint("role IN ('provider', 'receiver')", name="check_user_role"),
