@@ -23,6 +23,39 @@
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4);
 }
 
+/* Typing effect styles */
+.typing-text {
+  display: inline-block;
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+.cursor {
+  display: inline-block;
+  background-color: white;
+  width: 10px;
+  height: 1.5rem;
+  margin-left: 5px;
+  animation: blink 0.7s step-end infinite;
+}
+
+/* Blinking cursor animation */
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Blur effect for content between sections */
+.blur-effect {
+  backdrop-filter: blur(5px);
+}
+
+/* Glow effect for text */
+.text-shadow-lg {
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.7), 0 0 16px rgba(255, 255, 255, 0.7);
+}
+
 
 .space-header {
   @apply font-future text-white uppercase tracking-wider;
