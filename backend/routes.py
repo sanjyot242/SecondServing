@@ -7,9 +7,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from config.logging_config import get_logger
 from config.database import get_db
-from models import UserCreate, Token, FoodItemCreate, FoodItemOut, RequestOut, RequestCreate
+from models import UserCreate, Token, FoodItemCreate, FoodItemOut, RequestOut, RequestCreate, FeedbackCreate, FeedbackOut
+from models import FoodCategory
 from schema import User
-from crud import create_user, get_user_by_email, create_new_food_item, get_active_inventory, create_request, match_requests_to_food_items, mark_expired_food_items_as_fulfilled, mark_food_as_fulfilled
+from crud import create_user, get_user_by_email, create_new_food_item, get_active_inventory, create_request, match_requests_to_food_items, mark_expired_food_items_as_fulfilled, mark_food_as_fulfilled, submit_feedback
 from auth import authenticate_user, create_access_token, get_current_user, set_auth_cookie, get_password_hash
 from fastapi.responses import JSONResponse
 
@@ -184,3 +185,16 @@ def load_active_inventory(
 
     inventory = get_active_inventory(db, user.id)
     return {"inventory": inventory}
+
+
+####################### FEEDBACK ENDPOINTS #######################
+@app_router.post("/feedback", response_model=FeedbackOut)
+def leave_feedback(
+    feedback_data: FeedbackCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "receiver":
+        raise HTTPException(status_code=403, detail="Only receivers can leave feedback")
+
+    return submit_feedback(db, current_user.id, feedback_data)
