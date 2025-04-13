@@ -10,23 +10,17 @@ def create_user(db: Session, user_data: UserCreate, hashed_password: str):
     user = User(
         email=user_data.email,
         name=user_data.name,
-        hashed_password=hashed_password,
+        password_hash=hashed_password,
         location=user_data.location,
         type=user_data.type,
-        contact_info=user_data.contactInfo,
+        contact_info=user_data.contact_info,
         role=user_data.role,
     )
     db.add(user)
     db.flush()  # Get auth_id
-
-    # Then create user with auth_id
-    db_user = User(
-        auth_id=user.id
-    )
-    db.add(db_user)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(user)
+    return user
 
 def get_user_by_email(db: Session, email: str):
     """Get auth entry by email"""
