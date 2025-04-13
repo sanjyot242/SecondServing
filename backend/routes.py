@@ -1,3 +1,5 @@
+#ALl the endpoints will be defined here
+
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from config.logging_config import get_logger
