@@ -11,6 +11,7 @@ import DonorDashboard from './DonorDashboard';
 import AddStockPage from './AddStockPage';
 import CreateRequestPage from './CreateRequestPage';
 import ViewRequestsPage from './ViewRequestPage';
+import DonorAnalyticsPage from './DonorAnalyticsPage';
 
 // This component handles routing for both shelter and donor dashboards
 const DashboardRouter: React.FC = () => {
@@ -31,6 +32,7 @@ const DashboardRouter: React.FC = () => {
           <>
             <Route path='/add-stock' element={<AddStockPage />} />
             <Route path='/requests' element={<ViewRequestsPage />} />
+            <Route path='/analytics' element={<DonorAnalyticsPage />} />
           </>
         )}
 
