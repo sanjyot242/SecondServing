@@ -144,12 +144,7 @@ def get_all_open_requests(
     from sqlalchemy import or_
     
     # Get all open requests
-    open_requests = db.query(Request).filter(
-        or_(
-            Request.status == "open",
-            Request.status == "matched"
-        )
-    ).all()
+    open_requests = db.query(Request).all()
     
     result = []
     for req in open_requests:

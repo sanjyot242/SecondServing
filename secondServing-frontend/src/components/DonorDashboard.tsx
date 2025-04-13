@@ -79,6 +79,7 @@ const DonorDashboard: React.FC = () => {
   const [inventory, setInventory] = useState([]);
   useEffect(() => {
     fetchActiveInventory().then(setInventory).catch(console.error);
+    //take match method
   }, [location.pathname]);
 
   const fetchActiveInventory = async () => {
