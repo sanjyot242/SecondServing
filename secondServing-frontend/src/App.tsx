@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import UserTypeSelection from './components/UserTypeSelection';
 import ShelterRegistrationForm from './components/ShelterRegistrationForm';
 import DonatorRegistrationForm from './components/DonatorRegistrationForm';
@@ -10,7 +10,6 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LandingPage from './components/LandingPage'; // Import LandingPage component
-
 
 const App: React.FC = () => {
   return (
@@ -24,6 +23,10 @@ const App: React.FC = () => {
 
 const AppContent: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+
+  // Add this to ensure navbar and footer consistency
+  const showNavbarAndFooter = isAuthenticated && location.pathname.startsWith('/dashboard');
 
   if (isLoading) {
     return (
@@ -37,14 +40,14 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="app">
-      {/* Navbar and Footer only show when user is authenticated and on the dashboard */}
-      {isAuthenticated && <Navbar />}
+      {/* Only show navbar and footer when authenticated and on dashboard */}
+      {showNavbarAndFooter && <Navbar />}
       
       <Routes>
         {/* Landing page route */}
         <Route 
           path="/" 
-          element={<LandingPage />}  // Show landing page first
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />} 
         />
 
         {/* After "Join Us" click, navigate to UserTypeSelection */}
@@ -81,8 +84,8 @@ const AppContent: React.FC = () => {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {/* Footer only shows on dashboard and when authenticated */}
-      {isAuthenticated && <Footer />}
+      {/* Footer only shows when navbar shows */}
+      {showNavbarAndFooter && <Footer />}
     </div>
   );
 };
