@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import LandingPage from './components/LandingPage'; // Import LandingPage component
 
 const App: React.FC = () => {
   return (
@@ -35,13 +36,23 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="app">
-      <Navbar />
+      {/* Navbar and Footer only show when user is authenticated and on the dashboard */}
+      {isAuthenticated && <Navbar />}
+      
       <Routes>
-        {/* Public routes */}
+        {/* Landing page route */}
         <Route 
           path="/" 
+          element={<LandingPage />}  // Show landing page first
+        />
+
+        {/* After "Join Us" click, navigate to UserTypeSelection */}
+        <Route 
+          path="/user-type-selection" 
           element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <UserTypeSelection />} 
         />
+        
+        {/* Public routes */}
         <Route 
           path="/register/shelter" 
           element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <ShelterRegistrationForm />} 
@@ -55,7 +66,7 @@ const AppContent: React.FC = () => {
           element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginForm />} 
         />
         
-        {/* Protected routes */}
+        {/* Protected route for the Dashboard */}
         <Route 
           path="/dashboard/*" 
           element={
@@ -68,7 +79,9 @@ const AppContent: React.FC = () => {
         {/* Fallback route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      <Footer />
+
+      {/* Footer only shows on dashboard and when authenticated */}
+      {isAuthenticated && <Footer />}
     </div>
   );
 };

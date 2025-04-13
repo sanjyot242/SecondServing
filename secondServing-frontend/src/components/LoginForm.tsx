@@ -56,11 +56,11 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 space-container">
+      <div className="max-w-md w-full backdrop-blur-md bg-white/30 rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Sign In</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold text-gray-800 space-header">Sign In</h1>
+          <p className="text-gray-600 mt-2 space-subheader">
             {userType === 'shelter' 
               ? 'Access your shelter account' 
               : 'Access your donor account'}
@@ -84,7 +84,7 @@ const LoginForm: React.FC = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 donor-input"
             />
           </div>
           
@@ -98,7 +98,7 @@ const LoginForm: React.FC = () => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 donor-input"
             />
           </div>
           
@@ -125,8 +125,8 @@ const LoginForm: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-4 text-white font-medium rounded-lg transition duration-150 disabled:bg-gray-400 ${
-              userType === 'shelter' ? 'bg-teal-600 hover:bg-teal-700' : 'bg-blue-600 hover:bg-blue-700'
+            className={`w-full py-3 px-4 text-white font-medium rounded-lg transition duration-150 disabled:bg-gray-400 glow-effect space-button-ghost ${
+              userType === 'shelter' ? 'bg-teal-600 hover:bg-teal-700' : 'bg-teal-600 hover:bg-teal-700'
             }`}
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
