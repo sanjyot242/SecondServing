@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 const ShelterRegistrationForm: React.FC = () => {
   const navigate = useNavigate();
   const { registerShelter } = useAuth();
-  
+
   const [formData, setFormData] = useState<ShelterData>({
     name: '',
     location: '',
@@ -54,10 +54,10 @@ const ShelterRegistrationForm: React.FC = () => {
       initial={{ x: '100%' }}  // Start off-screen to the right
       animate={{ x: 0 }}       // Animate to center position
       exit={{ x: '-100%' }}     // Move to the left (off-screen) when navigating away
-      transition={{ 
-        type: 'spring', 
-        stiffness: 100, 
-        damping: 25, 
+      transition={{
+        type: 'spring',
+        stiffness: 100,
+        damping: 25,
         duration: 1
       }}
     >
@@ -197,13 +197,15 @@ const ShelterRegistrationForm: React.FC = () => {
             </div>
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition duration-150 disabled:bg-gray-400 glow-effect space-button-ghost"
-            >
-              {isLoading ? 'Registering...' : 'Register'}
-            </button>
+            <div className="mb-4 col-span-2">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition duration-150 disabled:bg-gray-400 glow-effect space-button-ghost"
+              >
+                {isLoading ? 'Registering...' : 'Register'}
+              </button>
+            </div>
           </form>
 
           <div className="mt-4 text-center">

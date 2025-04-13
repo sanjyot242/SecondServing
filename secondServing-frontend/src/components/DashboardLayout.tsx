@@ -14,11 +14,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const userTypeValue = userType || 'shelter';
 
   return (
-    <div className='flex min-h-screen bg-cosmos-void'>
+    <div className="flex min-h-screen bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(../../public/Images/bg-1.jpg)' }}>
+      {/* Side Navigation */}
       <SideNavigation userType={userTypeValue as 'shelter' | 'donator'} />
 
-      <div className='flex-1 p-6 overflow-y-auto'>
-        <div className='max-w-7xl mx-auto'>{children || <Outlet />}</div>
+      {/* Main Content */}
+      <div className="flex-1 p-8 md:p-16 rounded-lg mx-auto my-4 ">
+        <div className="max-w-7xl mx-auto text-white">
+          {children || <Outlet />}
+        </div>
       </div>
     </div>
   );

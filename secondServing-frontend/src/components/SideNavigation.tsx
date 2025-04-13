@@ -71,17 +71,14 @@ const SideNavigation: React.FC<SideNavigationProps> = ({ userType }) => {
       <div className='mb-8'>
         <div className='flex items-center mb-8'>
           <div className='p-2'>
-            {/* Replace with your actual logo */}
-            <svg viewBox='0 0 30 30' fill='none' className='h-8 w-8'>
-              <path
-                d='M15 3C8.373 3 3 8.373 3 15s5.373 12 12 12 12-5.373 12-12S21.627 3 15 3z'
-                stroke='white'
-                strokeWidth='2'
-              />
-              <path d='M10 15a5 5 0 0110 0v5H10v-5z' fill='#64B5F6' />
-            </svg>
+            {/* Replace the SVG logo with your custom logo image */}
+            <img
+              src='/public/Images/logo.png' // Update this path with your logo image
+              alt='Second Serving Logo'
+              className='h-10 w-10' // Adjust size as needed
+            />
           </div>
-          <h1 className='text-white font-future text-xl ml-2'>RePlate</h1>
+          <h1 className='text-white font-future text-xl ml-2'>Second Serving</h1>
         </div>
       </div>
 
