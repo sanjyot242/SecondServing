@@ -1,102 +1,74 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import UserTypeSelection from './components/UserTypeSelection';
 import ShelterRegistrationForm from './components/ShelterRegistrationForm';
 import DonatorRegistrationForm from './components/DonatorRegistrationForm';
 import LoginForm from './components/LoginForm';
-import { UserType } from './types';
-
-
-enum AuthStage {
-  SELECT_USER_TYPE,
-  REGISTER,
-  LOGIN,
-  AUTHENTICATED
-}
+import Dashboard from './components/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 const App: React.FC = () => {
-  const [authStage, setAuthStage] = useState<AuthStage>(AuthStage.SELECT_USER_TYPE);
-  const [userType, setUserType] = useState<UserType | null>(null);
+  return (
+    <AuthProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </AuthProvider>
+  );
+};
 
-  const handleUserTypeSelect = (type: UserType) => {
-    setUserType(type);
-    setAuthStage(AuthStage.REGISTER);
-  };
+const AppContent: React.FC = () => {
+  const { isAuthenticated, isLoading } = useAuth();
 
-  const handleRegistrationSuccess = () => {
-    setAuthStage(AuthStage.AUTHENTICATED);
-  };
-
-  const handleLoginSuccess = () => {
-    setAuthStage(AuthStage.AUTHENTICATED);
-  };
-
-  const switchToLogin = () => {
-    setAuthStage(AuthStage.LOGIN);
-  };
-
-  const switchToRegistration = () => {
-    setAuthStage(AuthStage.REGISTER);
-  };
-
-  const switchUserType = () => {
-    setUserType(userType === 'shelter' ? 'donator' : 'shelter');
-  };
-
-  const renderAuthComponent = () => {
-    switch (authStage) {
-      case AuthStage.SELECT_USER_TYPE:
-        return <UserTypeSelection onSelectUserType={handleUserTypeSelect} />;
-      case AuthStage.REGISTER:
-        return userType === 'shelter' ? (
-          <ShelterRegistrationForm 
-            onRegistrationSuccess={handleRegistrationSuccess} 
-            switchToLogin={switchToLogin}
-          />
-        ) : (
-          <DonatorRegistrationForm 
-            onRegistrationSuccess={handleRegistrationSuccess} 
-            switchToLogin={switchToLogin}
-          />
-        );
-      case AuthStage.LOGIN:
-        return userType ? (
-          <LoginForm 
-            userType={userType}
-            onLoginSuccess={handleLoginSuccess}
-            switchToRegistration={switchToRegistration}
-            onSwitchUserType={switchUserType}
-          />
-        ) : (
-          <UserTypeSelection onSelectUserType={handleUserTypeSelect} />
-        );
-      case AuthStage.AUTHENTICATED:
-        return (
-          <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-            <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-              <h1 className="text-3xl font-bold text-gray-800 mb-4">Welcome to SecondServing!</h1>
-              <p className="text-gray-600 mb-8">
-                You have successfully authenticated as a {userType}.
-              </p>
-              <button
-                onClick={() => {
-                  setAuthStage(AuthStage.SELECT_USER_TYPE);
-                  setUserType(null);
-                }}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        );
-      default:
-        return <UserTypeSelection onSelectUserType={handleUserTypeSelect} />;
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-xl text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app">
-      {renderAuthComponent()}
+      <Navbar />
+      <Routes>
+        {/* Public routes */}
+        <Route 
+          path="/" 
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <UserTypeSelection />} 
+        />
+        <Route 
+          path="/register/shelter" 
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <ShelterRegistrationForm />} 
+        />
+        <Route 
+          path="/register/donator" 
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <DonatorRegistrationForm />} 
+        />
+        <Route 
+          path="/login" 
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginForm />} 
+        />
+        
+        {/* Protected routes */}
+        <Route 
+          path="/dashboard/*" 
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Fallback route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <Footer />
     </div>
   );
 };
