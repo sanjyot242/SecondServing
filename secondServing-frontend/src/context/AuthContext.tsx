@@ -6,6 +6,7 @@ interface User {
   user_id: number;
   email: string;
   role: 'provider' | 'receiver';
+
 }
 
 interface AuthContextType {
