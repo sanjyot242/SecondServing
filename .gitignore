@@ -1,2 +1,10 @@
 # Node.js dependencies
 node_modules/
+
+
+
+#Backend
+.env
+backend/schema.py
+__pycache__/
+.venv
