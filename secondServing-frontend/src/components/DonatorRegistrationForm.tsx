@@ -52,11 +52,11 @@ const DonatorRegistrationForm: React.FC<DonatorRegistrationFormProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-8 space-container">
+      <div className="max-w-md w-full backdrop-blur-md bg-white/30 rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Register as a Donor</h1>
-          <p className="text-gray-600 mt-2">Join SecondServing to donate surplus food</p>
+          <h1 className="text-3xl font-bold text-gray-800 space-header">Register as a Donor</h1>
+          <p className="text-gray-600 mt-2 space-subheader">Join SecondServing to donate surplus food</p>
         </div>
         
         {error && (
@@ -77,7 +77,7 @@ const DonatorRegistrationForm: React.FC<DonatorRegistrationFormProps> = ({
               required
               value={formData.name}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 donor-input"
             />
           </div>
           
@@ -91,7 +91,7 @@ const DonatorRegistrationForm: React.FC<DonatorRegistrationFormProps> = ({
               required
               value={formData.type}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 donor-input"
             >
               <option value="">Select your business type</option>
               {donorTypes.map((type) => (
@@ -113,7 +113,7 @@ const DonatorRegistrationForm: React.FC<DonatorRegistrationFormProps> = ({
               required
               value={formData.location}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500 donor-input"
               placeholder="Full address"
             />
           </div>
@@ -129,7 +129,7 @@ const DonatorRegistrationForm: React.FC<DonatorRegistrationFormProps> = ({
               required
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 donor-input"
             />
           </div>
           
@@ -144,7 +144,7 @@ const DonatorRegistrationForm: React.FC<DonatorRegistrationFormProps> = ({
               required
               value={formData.contactInfo}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500 donor-input"
               placeholder="Phone number"
             />
           </div>
@@ -160,7 +160,7 @@ const DonatorRegistrationForm: React.FC<DonatorRegistrationFormProps> = ({
               required
               value={formData.password}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 donor-input"
               minLength={8}
             />
           </div>
@@ -175,7 +175,7 @@ const DonatorRegistrationForm: React.FC<DonatorRegistrationFormProps> = ({
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 donor-input"
               minLength={8}
             />
           </div>
@@ -183,18 +183,18 @@ const DonatorRegistrationForm: React.FC<DonatorRegistrationFormProps> = ({
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-150 disabled:bg-gray-400"
+            className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition duration-150 disabled:bg-gray-400 glow-effect space-button-ghost"
           >
             {isLoading ? 'Registering...' : 'Register'}
           </button>
         </form>
         
         <div className="mt-4 text-center">
-          <p className="text-gray-600">
+          <p className="text-gray-800">
             Already have an account?{' '}
             <button 
               onClick={switchToLogin}
-              className="text-blue-600 hover:text-blue-800 font-medium"
+              className="text-blue-700 hover:text-blue-900 font-medium"
             >
               Sign in
             </button>
