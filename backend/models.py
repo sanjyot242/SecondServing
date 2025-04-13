@@ -1,10 +1,9 @@
-#For type verification using pydantic
-
 from pydantic import BaseModel, Field
 from typing import Literal, Optional
 from datetime import datetime
-
 from enum import Enum
+
+# -------------------- Enums --------------------
 
 class FoodCategory(str, Enum):
     produce = "Produce"
@@ -16,7 +15,9 @@ class FoodCategory(str, Enum):
     beverages = "Beverages"
     frozen_foods = "Frozen Foods"
     prepared_foods = "Prepared Foods"
-    others = "Others"
+    others = "Others"              
+
+# -------------------- User --------------------
 
 class UserCreate(BaseModel):
     name: str
@@ -27,14 +28,19 @@ class UserCreate(BaseModel):
     email: str
     role: str
 
+    model_config = {
+        "populate_by_name": True
+    }
+
+# -------------------- Auth --------------------
+
 class Token(BaseModel):
     user_id: int
-
 
 class TokenData(BaseModel):
     email: str
 
-
+# -------------------- Food Item --------------------
 
 class FoodItemCreate(BaseModel):
     title: str
@@ -42,28 +48,26 @@ class FoodItemCreate(BaseModel):
     category: FoodCategory
     quantity: int
     expiry: datetime
-    available_from: Optional[datetime]
-    available_until: Optional[datetime]
+    available_from: Optional[datetime] = None
+    available_until: Optional[datetime] = None
     pickup_location: str = Field(..., alias="pickupLocation")
+
+    model_config = {
+        "populate_by_name": True,
+        "extra": "ignore"
+    }
 
 class FoodItemOut(FoodItemCreate):
     id: int
     status: str
     created_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True
+    }
 
-
-class FoodItemCreate(BaseModel):
-    title: str
-    description: Optional[str]
-    category: FoodCategory
-    quantity: int
-    expiry: datetime
-    available_from: Optional[datetime]
-    available_until: Optional[datetime]
-    pickup_location: str
+# -------------------- Request --------------------
 
 class RequestCreate(BaseModel):
     title: str
@@ -75,10 +79,16 @@ class RequestCreate(BaseModel):
     is_recurring: Optional[bool] = False
     notes: Optional[str] = None
 
+    model_config = {
+        "populate_by_name": True
+    }
+
 class RequestOut(RequestCreate):
     id: int
     status: str
     created_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True
+    }
