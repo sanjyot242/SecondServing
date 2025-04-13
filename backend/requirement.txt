@@ -6,4 +6,3 @@ sqlalchemy
 pydantic
 passlib
 python-jose
-bcrypt
