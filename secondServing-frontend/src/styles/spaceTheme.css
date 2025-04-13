@@ -12,6 +12,11 @@
   background-image: url('../../public/Images/bg-1.jpg');
 }
 
+.space-container2 {
+  @apply min-h-screen bg-cover bg-center bg-no-repeat;
+  background-image: url('../../public/Images/LandingPage.png');
+}
+
 .space-header {
   @apply font-future text-white uppercase tracking-wider;
 }
