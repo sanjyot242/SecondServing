@@ -4,6 +4,8 @@ export interface ShelterData {
     volunteerEmails: string[];
     password: string;
     contactNumber: string;
+    role: string;
+    
   }
   
   export interface DonatorData {
@@ -13,6 +15,8 @@ export interface ShelterData {
     contactInfo: string;
     password: string;
     email: string;
+    role:string
+    
   }
   
   export type UserType = 'shelter' | 'donator';

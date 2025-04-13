@@ -1,23 +1,18 @@
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { DonatorData } from '../types';
 import { registerDonator } from '../api/auth';
 
-interface DonatorRegistrationFormProps {
-  onRegistrationSuccess: () => void;
-  switchToLogin: () => void;
-}
-
-const DonatorRegistrationForm: React.FC<DonatorRegistrationFormProps> = ({
-  onRegistrationSuccess,
-  switchToLogin
-}) => {
+const DonatorRegistrationForm: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<DonatorData>({
     name: '',
     location: '',
     type: '',
     contactInfo: '',
     password: '',
-    email: ''
+    email: '',
+    role: 'donor'
   });
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -42,8 +37,14 @@ const DonatorRegistrationForm: React.FC<DonatorRegistrationFormProps> = ({
     setError('');
     
     try {
-      await registerDonator(formData);
-      onRegistrationSuccess();
+      const response = await registerDonator(formData);
+      
+      // Store token and user info
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      
+      // Redirect to dashboard
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Registration failed');
     } finally {
@@ -192,12 +193,12 @@ const DonatorRegistrationForm: React.FC<DonatorRegistrationFormProps> = ({
         <div className="mt-4 text-center">
           <p className="text-gray-800">
             Already have an account?{' '}
-            <button 
-              onClick={switchToLogin}
+            <Link 
+              to="/login?type=donator"
               className="text-blue-700 hover:text-blue-900 font-medium"
             >
               Sign in
-            </button>
+            </Link>
           </p>
         </div>
       </div>

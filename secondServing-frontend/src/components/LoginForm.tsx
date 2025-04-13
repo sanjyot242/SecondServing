@@ -1,24 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { UserType } from '../types';
 import { login } from '../api/auth';
 
-interface LoginFormProps {
-  userType: UserType;
-  onLoginSuccess: () => void;
-  switchToRegistration: () => void;
-  onSwitchUserType: () => void;
-}
-
-const LoginForm: React.FC<LoginFormProps> = ({
-  userType,
-  onLoginSuccess,
-  switchToRegistration,
-  onSwitchUserType
-}) => {
+const LoginForm: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [userType, setUserType] = useState<UserType>('shelter');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Get the userType from localStorage when component mounts
+  useEffect(() => {
+    const storedUserType = localStorage.getItem('userType') as UserType;
+    if (storedUserType) {
+      setUserType(storedUserType);
+    }
+    
+    // Check if there's a userType in query params
+    const params = new URLSearchParams(location.search);
+    const typeFromParams = params.get('type') as UserType;
+    if (typeFromParams && (typeFromParams === 'shelter' || typeFromParams === 'donator')) {
+      setUserType(typeFromParams);
+      localStorage.setItem('userType', typeFromParams);
+    }
+  }, [location]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,13 +34,25 @@ const LoginForm: React.FC<LoginFormProps> = ({
     setError('');
     
     try {
-      await login(email, password, userType);
-      onLoginSuccess();
+      const response = await login(email, password, userType);
+      
+      // Store the token in localStorage
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      
+      // Redirect to dashboard
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Login failed');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const switchUserType = () => {
+    const newUserType = userType === 'shelter' ? 'donator' : 'shelter';
+    setUserType(newUserType);
+    localStorage.setItem('userType', newUserType);
   };
 
   return (
@@ -116,18 +136,18 @@ const LoginForm: React.FC<LoginFormProps> = ({
         <div className="mt-4 text-center">
           <p className="text-gray-600">
             Don't have an account?{' '}
-            <button 
-              onClick={switchToRegistration}
+            <Link 
+              to={`/register/${userType}`}
               className={`font-medium ${
                 userType === 'shelter' ? 'text-teal-600 hover:text-teal-800' : 'text-blue-600 hover:text-blue-800'
               }`}
             >
               Register
-            </button>
+            </Link>
           </p>
           
           <button 
-            onClick={onSwitchUserType}
+            onClick={switchUserType}
             className="mt-2 text-sm text-gray-600 hover:text-gray-800"
           >
             I'm a {userType === 'shelter' ? 'Donor' : 'Shelter'} instead
