@@ -1,43 +1,75 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { getCurrentUser, logout } from '../api/auth';
 
-interface User {
-  name: string;
-  role: string;
-  // Add other user properties as needed
+interface UserData {
+  user_id: number;
+  email: string;
+  role: 'provider' | 'receiver';
 }
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  
-  useEffect(() => {
-    // Get user info from localStorage
-    const userString = localStorage.getItem('user');
-    if (userString) {
-      try {
-        const userData = JSON.parse(userString);
-        setUser(userData);
-      } catch (error) {
-        console.error('Failed to parse user data:', error);
-        handleSignOut();
-      }
-    }
-  }, []);
+  const { setUserType } = useAuth();
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleSignOut = () => {
-    // Clear localStorage and redirect to home
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('userType');
-    navigate('/');
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        // This will automatically send the access_token cookie
+        const data = await getCurrentUser();
+        setUserData(data);
+        
+        // Update auth context
+        if (data.role === 'provider') {
+          setUserType('donator');
+        } else if (data.role === 'receiver') {
+          setUserType('shelter');
+        }
+      } catch (error) {
+        console.error('Authentication failed:', error);
+        navigate('/login');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [navigate, setUserType]);
+  
+  const handleSignOut = async () => {
+    try {
+      // This will clear the access_token cookie
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
-  if (!user) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-gray-600">Loading...</p>
+          <p className="text-xl text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-xl text-gray-600">Authentication error. Please log in again.</p>
+          <button 
+            onClick={() => navigate('/login')}
+            className="mt-4 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
+          >
+            Go to Login
+          </button>
         </div>
       </div>
     );
@@ -48,16 +80,16 @@ const Dashboard: React.FC = () => {
       <div className="max-w-4xl w-full bg-white rounded-lg shadow-lg p-8 text-center">
         <h1 className="text-3xl font-bold text-gray-800 mb-4">Welcome to SecondServing!</h1>
         <p className="text-gray-600 mb-8">
-          You have successfully authenticated as a {user.role === 'donor' ? 'donor' : 'shelter'}.
+          You are logged in as a {userData.role === 'provider' ? 'food donor' : 'shelter'}.
         </p>
         
         {/* Dashboard content will go here */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Your Dashboard</h2>
           <div className="bg-gray-50 p-6 rounded-lg">
-            <p className="text-gray-700">Welcome, {user.name}!</p>
+            <p className="text-gray-700">Welcome, {userData.email}!</p>
             <p className="text-gray-700 mt-2">
-              {user.role === 'donor' 
+              {userData.role === 'provider' 
                 ? 'Here you can manage your food donations and see the impact you\'re making.' 
                 : 'Here you can manage incoming donations and communicate with donors.'}
             </p>

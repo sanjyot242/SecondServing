@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { getCurrentUser } from '../api/auth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -9,9 +10,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Check if user is authenticated
-    const token = localStorage.getItem('token');
-    setIsAuthenticated(!!token);
+    const checkAuth = async () => {
+      try {
+        // This endpoint checks for the access_token cookie
+        await getCurrentUser();
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Authentication check failed:', error);
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
   // Show loading while checking authentication

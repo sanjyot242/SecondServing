@@ -1,4 +1,4 @@
-// Modified auth.ts
+// src/api/auth.ts
 
 import axios from 'axios';
 import { ShelterData, DonatorData } from '../types';
@@ -26,18 +26,25 @@ export const registerDonator = async (donatorData: DonatorData) => {
   }
 };
 
-export const login = async (email: string, password: string, userType: string) => {
+export const login = async (email: string, password: string) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, { email, password, userType });
+    // Using FormData as required by OAuth2PasswordRequestForm in FastAPI
+    const formData = new FormData();
+    formData.append('username', email); // OAuth2 expects 'username' field
+    formData.append('password', password);
+    
+    // This endpoint will set the access_token cookie automatically
+    const response = await axios.post(`${API_URL}/token`, formData);
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
-export const checkAuthStatus = async () => {
+export const getCurrentUser = async () => {
   try {
-    const response = await axios.get(`${API_URL}/me`);
+    // This endpoint relies on the access_token cookie being sent
+    const response = await axios.get(`${API_URL}/auth/me`);
     return response.data;
   } catch (error) {
     throw error;
@@ -46,11 +53,8 @@ export const checkAuthStatus = async () => {
 
 export const logout = async () => {
   try {
-    const response = await axios.post(`${API_URL}/logout`);
-    // Clear local storage on successful logout
-    localStorage.removeItem('user_id');
-    localStorage.removeItem('userType');
-    return response.data;
+    await axios.post(`${API_URL}/logout`);
+    return { success: true };
   } catch (error) {
     throw error;
   }

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ShelterData } from '../types';
-import { registerShelter } from '../api/auth';
+import { useAuth } from '../context/AuthContext';
 
 const ShelterRegistrationForm: React.FC = () => {
   const navigate = useNavigate();
+  const { registerShelter } = useAuth();
+  
   const [formData, setFormData] = useState<ShelterData>({
     name: '',
     location: '',
@@ -22,7 +24,6 @@ const ShelterRegistrationForm: React.FC = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -36,8 +37,6 @@ const ShelterRegistrationForm: React.FC = () => {
 
     try {
       await registerShelter(formData);
-        
-      // Redirect to dashboard
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Registration failed');
@@ -93,7 +92,7 @@ const ShelterRegistrationForm: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email
             </label>
             <input
