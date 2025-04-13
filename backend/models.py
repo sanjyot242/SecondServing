@@ -1,8 +1,22 @@
 #For type verification using pydantic
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Literal, Optional
 from datetime import datetime
+
+from enum import Enum
+
+class FoodCategory(str, Enum):
+    produce = "Produce"
+    dairy = "Dairy"
+    meat = "Meat"
+    baked_goods = "Baked Goods"
+    canned_goods = "Canned Goods"
+    dry_goods = "Dry Goods"
+    beverages = "Beverages"
+    frozen_foods = "Frozen Foods"
+    prepared_foods = "Prepared Foods"
+    others = "Others"
 
 class UserCreate(BaseModel):
     name: str
@@ -19,3 +33,52 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     email: str
+
+
+
+class FoodItemCreate(BaseModel):
+    title: str
+    description: Optional[str]
+    category: FoodCategory
+    quantity: int
+    expiry: datetime
+    available_from: Optional[datetime]
+    available_until: Optional[datetime]
+    pickup_location: str = Field(..., alias="pickupLocation")
+
+class FoodItemOut(FoodItemCreate):
+    id: int
+    status: str
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class FoodItemCreate(BaseModel):
+    title: str
+    description: Optional[str]
+    category: FoodCategory
+    quantity: int
+    expiry: datetime
+    available_from: Optional[datetime]
+    available_until: Optional[datetime]
+    pickup_location: str
+
+class RequestCreate(BaseModel):
+    title: str
+    requested_item: str
+    category: FoodCategory
+    quantity: int
+    urgency: Literal["low", "medium", "high"]
+    needed_by: Optional[datetime] = None
+    is_recurring: Optional[bool] = False
+    notes: Optional[str] = None
+
+class RequestOut(RequestCreate):
+    id: int
+    status: str
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
