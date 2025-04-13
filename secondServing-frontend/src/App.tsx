@@ -10,6 +10,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LandingPage from './components/LandingPage'; // Import LandingPage component
+import PostSurplusFoodForm from './components/PostSurplusFoodForm';
 
 const App: React.FC = () => {
   return (
@@ -55,7 +56,7 @@ const AppContent: React.FC = () => {
         {/* Public routes */}
         <Route 
           path="/register/shelter" 
-          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <ShelterRegistrationForm />} 
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <PostSurplusFoodForm />} 
         />
         <Route 
           path="/register/donator" 
