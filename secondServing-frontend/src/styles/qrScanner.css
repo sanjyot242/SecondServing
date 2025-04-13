@@ -1,0 +1,144 @@
+/* src/styles/qrScanner.css */
+
+/* Scanner line animation */
+@keyframes scannerLine {
+  0% {
+    top: 0;
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0.5;
+  }
+}
+
+.animate-scanner-line {
+  animation: scannerLine 2s ease-in-out infinite;
+}
+
+/* Scanner frame pulse animation */
+@keyframes framePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(78, 152, 237, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(78, 152, 237, 0);
+  }
+}
+
+.animate-frame-pulse {
+  animation: framePulse 2s infinite;
+}
+
+/* Scanner target corners animation */
+@keyframes cornerPulse {
+  0%,
+  100% {
+    border-color: rgba(78, 152, 237, 0.6);
+  }
+  50% {
+    border-color: rgba(78, 152, 237, 1);
+  }
+}
+
+.animate-corner-pulse {
+  animation: cornerPulse 2s infinite;
+}
+
+/* Success check mark animation */
+@keyframes successPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+.animate-success-pulse {
+  animation: successPulse 1.5s ease-in-out infinite;
+}
+
+/* QR code shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(78, 152, 237, 0),
+    rgba(78, 152, 237, 0.2),
+    rgba(78, 152, 237, 0)
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Fade in animation for QR product details */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Staggered fade-in for multiple items */
+.stagger-fade-in > * {
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.stagger-fade-in > *:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.stagger-fade-in > *:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.stagger-fade-in > *:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.stagger-fade-in > *:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.stagger-fade-in > *:nth-child(5) {
+  animation-delay: 0.5s;
+}
+.stagger-fade-in > *:nth-child(6) {
+  animation-delay: 0.6s;
+}
+
+/* Subtle background animation for scanner */
+@keyframes backgroundPulse {
+  0%,
+  100% {
+    background-color: rgba(0, 0, 0, 0.95);
+  }
+  50% {
+    background-color: rgba(0, 0, 0, 0.85);
+  }
+}
+
+.animate-bg-pulse {
+  animation: backgroundPulse 4s infinite;
+}
