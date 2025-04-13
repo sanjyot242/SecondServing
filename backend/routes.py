@@ -7,9 +7,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from config.logging_config import get_logger
 from config.database import get_db
-from models import UserCreate, Token, FoodItemCreate, FoodItemOut, RequestOut, RequestCreate, FeedbackCreate, FeedbackOut
+from models import UserCreate, Token, FoodItemCreate, FoodItemOut, RequestOut, RequestCreate
 from schema import User
-from crud import create_user, get_user_by_email, create_new_food_item, get_available_food_items, create_request, submit_feedback
+from crud import create_user, get_user_by_email, create_new_food_item, get_available_food_items, create_request
 from auth import authenticate_user, create_access_token, get_current_user, set_auth_cookie, get_password_hash
 from fastapi.responses import JSONResponse
 
@@ -148,3 +148,4 @@ def get_recommended_food(
     except Exception as exc:
         logger.error(f"An unexpected error occurred: {exc}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
+    

@@ -3,8 +3,8 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from fastapi import HTTPException
-from models import UserCreate, FoodItemCreate, RequestCreate, FeedbackCreate
-from schema import User, FoodItem, Request, Feedback
+from models import UserCreate, FoodItemCreate, RequestCreate
+from schema import User, FoodItem, Request
 
 def create_user(db: Session, user_data: UserCreate, hashed_password: str):
     """Create a new user with auth info"""

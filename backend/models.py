@@ -1,7 +1,7 @@
 #For type verification using pydantic
 
-from pydantic import BaseModel, Field, conint
-from typing import Literal, Optional, Annotated
+from pydantic import BaseModel, Field
+from typing import Literal, Optional
 from datetime import datetime
 
 from enum import Enum
