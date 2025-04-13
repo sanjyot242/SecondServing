@@ -7,7 +7,7 @@ from datetime import datetime
 class UserCreate(BaseModel):
     name: str
     location: str
-    type: str
+    type: Optional[str]
     contactInfo: str
     password: str
     email: str
