@@ -37,6 +37,8 @@ const SAMPLE_REQUESTS = [
 ];
 
 const ShelterDashboard: React.FC = () => {
+  const { userType } = useAuth();
+  const userTypeValue = userType || 'shelter';
   const navigate = useNavigate();
   const API_URL = 'http://localhost:8080';
   const { user } = useAuth();
@@ -74,7 +76,7 @@ const ShelterDashboard: React.FC = () => {
         <StatusCard
           title='Requested Deliveries'
           count={requests.length}
-          userType='shelter'
+          userType={userTypeValue}
           icon='clipboard'
         />
 
@@ -82,7 +84,7 @@ const ShelterDashboard: React.FC = () => {
           label='Request Stock'
           icon='plus'
           onClick={() => navigate('/dashboard/create-request')}
-          userType='shelter'
+          userType={userTypeValue}
         />
       </div>
 
@@ -105,7 +107,7 @@ const ShelterDashboard: React.FC = () => {
                   status={request.status}
                   items={request.items}
                   notes={request.notes}
-                  userType='shelter'
+                  userType={userTypeValue}
                   onViewDetails={() =>
                     navigate(`/dashboard/requests/${request.id}`)
                   }

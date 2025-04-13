@@ -12,32 +12,40 @@ import AddStockPage from './AddStockPage';
 import CreateRequestPage from './CreateRequestPage';
 import ViewRequestsPage from './ViewRequestPage';
 
-// This component will replace your current Dashboard.tsx component
+// This component handles routing for both shelter and donor dashboards
 const DashboardRouter: React.FC = () => {
   const { userType } = useAuth();
+  const isDonor = userType === 'donator';
 
   return (
     <DashboardLayout>
       <Routes>
+        {/* Main dashboard - different for donors and shelters */}
         <Route
           path='/'
-          element={
-            userType === 'donator' ? <DonorDashboard /> : <ShelterDashboard />
-          }
+          element={isDonor ? <DonorDashboard /> : <ShelterDashboard />}
         />
-        <Route path='/add-stock' element={<AddStockPage />} />
-        <Route path='/create-request' element={<CreateRequestPage />} />
-        <Route path='/your-requests' element={<ViewRequestsPage />} />
-        <Route path='/requests' element={<ViewRequestsPage />} />
 
-        {/* Add more routes as needed */}
+        {/* Donor-specific routes */}
+        {isDonor && (
+          <>
+            <Route path='/add-stock' element={<AddStockPage />} />
+            <Route path='/requests' element={<ViewRequestsPage />} />
+          </>
+        )}
+
+        {/* Shelter-specific routes */}
+        {!isDonor && (
+          <>
+            <Route path='/create-request' element={<CreateRequestPage />} />
+            <Route path='/your-requests' element={<ViewRequestsPage />} />
+          </>
+        )}
 
         {/* Fallback to main dashboard */}
         <Route
           path='*'
-          element={
-            userType === 'donator' ? <DonorDashboard /> : <ShelterDashboard />
-          }
+          element={isDonor ? <DonorDashboard /> : <ShelterDashboard />}
         />
       </Routes>
     </DashboardLayout>

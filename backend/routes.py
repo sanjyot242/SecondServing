@@ -129,6 +129,53 @@ def submit_food_request(
     return create_request(db, current_user.id, request_data)
 
 
+@app_router.get("/all-requests")
+def get_all_open_requests(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get all open requests for providers to fulfill without matching."""
+    if current_user.role != "provider":
+        raise HTTPException(status_code=403, detail="Only providers can view available requests")
+    
+    # Get all open requests from all receivers
+    from schema import Request
+    from sqlalchemy import or_
+    
+    # Get all open requests
+    open_requests = db.query(Request).filter(
+        or_(
+            Request.status == "open",
+            Request.status == "matched"
+        )
+    ).all()
+    
+    result = []
+    for req in open_requests:
+        # Get the receiver's information
+        receiver = db.query(User).filter(User.id == req.receiver_id).first()
+        
+        result.append({
+            "id": req.id,
+            "title": req.title,
+            "created_at": req.created_at,
+            "urgency": req.urgency.capitalize(),
+            "status": req.status.capitalize(),
+            "notes": req.notes,
+            "requested_item": req.requested_item,
+            "category": req.category,
+            "quantity": req.quantity,
+            "matched_item_id": req.matched_item_id,
+            "receiver_name": receiver.name if receiver else "Unknown",
+            "items": [{
+                "name": req.requested_item,
+                "category": req.category,
+                "quantity": req.quantity,
+                "unit": "units"
+            }]
+        })
+    
+    return result
 
 
 @app_router.post("/match")
@@ -172,6 +219,73 @@ def fulfill_food_item(
 
     result = mark_food_as_fulfilled(food_id, db)
     return result
+
+
+@app_router.post("/request/{request_id}/fulfill")
+def fulfill_request_directly(
+    request_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    """Allow a provider to fulfill a request directly."""
+    if user.role != "provider":
+        return {"message": "Only providers can fulfill requests."}
+    
+    # Import the Request model from schema
+    from schema import Request, FoodItem
+    
+    # Get the request
+    request = db.query(Request).filter(Request.id == request_id).first()
+    
+    if not request:
+        return {"error": "Request not found."}
+        
+    if request.status not in ["open", "matched"]:
+        return {"error": f"Only open or matched requests can be fulfilled. Current status: {request.status}"}
+    
+    # Get provider information
+    provider = user
+    
+    # If the request is already matched to a food item, use that item
+    if request.status == "matched" and request.matched_item_id:
+        food_item = db.query(FoodItem).filter(FoodItem.id == request.matched_item_id).first()
+        if food_item:
+            food_item.status = "fulfilled"
+            db.add(food_item)
+    else:
+        # Create a placeholder fulfilled food item
+        from datetime import datetime, timedelta
+        
+        expiry = datetime.utcnow() + timedelta(days=1)
+        food_item = FoodItem(
+            provider_id=user.id,
+            title=f"Fulfilled: {request.requested_item}",
+            description=f"Fulfilled request for {request.requested_item}",
+            category=request.category,
+            quantity=request.quantity,
+            expiry=expiry,
+            available_from=datetime.utcnow(),
+            available_until=expiry,
+            pickup_location=provider.location,
+            status="fulfilled",
+            created_at=datetime.utcnow()
+        )
+        db.add(food_item)
+        db.flush()  # To get the ID
+        
+        # Link the food item to the request
+        request.matched_item_id = food_item.id
+    
+    # Update request status
+    request.status = "fulfilled"
+    db.add(request)
+    db.commit()
+    
+    return {
+        "message": "Request fulfilled successfully.",
+        "request_id": request.id,
+        "food_item_id": request.matched_item_id
+    }
 
 
 @app_router.get("/inventory/active")
