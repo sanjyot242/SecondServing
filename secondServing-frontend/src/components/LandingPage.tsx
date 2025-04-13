@@ -1,9 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const LandingPage: React.FC = () => {
   const [isButtonClicked, setIsButtonClicked] = useState(false);
+  const [quoteIndex, setQuoteIndex] = useState(0);
+  const [typedText, setTypedText] = useState("");
+  const quotes = [
+    "Bridging the gap between excess and need",
+    "Together, we can make a difference in the fight against hunger",
+    "Your food donation could change someone's life",
+    "Join us in reducing food waste and feeding those in need",
+    "Help us deliver hope through food"
+  ];
+
+  useEffect(() => {
+    let currentQuote = quotes[quoteIndex];
+    let currentText = "";
+    let i = 0;
+    const typingInterval = setInterval(() => {
+      if (i < currentQuote.length) {
+        currentText += currentQuote[i];
+        setTypedText(currentText);
+        i++;
+      } else {
+        clearInterval(typingInterval);
+        setTimeout(() => {
+          setQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
+        }, 2000); // Wait for 2 seconds before changing the quote
+      }
+    }, 100); // Typing speed (100ms per character)
+
+    return () => clearInterval(typingInterval);
+  }, [quoteIndex]);
 
   // Handle button click event to trigger fade-out animation
   const handleButtonClick = () => {
@@ -25,7 +54,8 @@ const LandingPage: React.FC = () => {
           </h1>
 
           <p className="text-lg sm:text-2xl mb-8 max-w-lg mx-auto space-subheader text-shadow-lg">
-            Bridging the gap between excess and need
+            <span className="typing-text">{typedText}</span>
+            <span className="cursor">|</span> {/* Cursor animation */}
           </p>
 
           {/* Animated Fade-In/Fade-Out Button */}
@@ -48,12 +78,12 @@ const LandingPage: React.FC = () => {
       </div>
 
       {/* New Section: Main Features and Mission */}
-      <div className="bg-white py-16">
+      <div className="bg-white py-16 blur-effect">
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-extrabold text-gray-800 mb-4">How it Works</h2>
           <p className="text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
-            Our app connects businesses with food donors to help reduce food waste.
-            By partnering with local shelters and nonprofits, we help redistribute food to
+            Our app connects businesses with food donors to help reduce food waste. 
+            By partnering with local shelters and nonprofits, we help redistribute food to 
             those in need. Join us in making a lasting impact on the environment and society.
           </p>
           <div className="flex justify-center gap-8">
@@ -70,7 +100,7 @@ const LandingPage: React.FC = () => {
       </div>
 
       {/* New Section: Testimonials */}
-      <div className="bg-teal-100 py-16">
+      <div className="bg-teal-100 py-16 blur-effect">
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-extrabold text-gray-800 mb-8">What Our Users Say</h2>
           <div className="flex justify-center gap-8">
