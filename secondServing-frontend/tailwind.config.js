@@ -35,6 +35,7 @@ module.exports = {
           }
         },
         
+        
         // User role-specific colors
         shelter: {
           primary: '#16A34A',      // A teal/green for shelters
