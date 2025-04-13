@@ -1,7 +1,8 @@
 #ALl the endpoints will be defined here
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List
+import random
 from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -322,3 +323,36 @@ def get_receiver_requests(
         raise HTTPException(status_code=403, detail="Only receivers can view their requests")
     
     return get_requests_for_receiver(db, current_user.id)
+
+######################### Analytics ENDPOINTS ###########################
+@app_router.get("/analytics/provider-impact")
+async def get_donation_analytics(current_user: User = Depends(get_current_user)):
+    if current_user.role != "provider":
+        return JSONResponse(status_code=403, content={"error": "Only providers can view analytics"})
+
+    now = datetime.utcnow()
+    categories = ["Produce", "Dairy", "Meat", "Baked Goods", "Dry Goods"]
+
+    mock_data = {
+        "summary": {
+            "total_donations": 23,
+            "total_quantity": 138,
+            "co2_saved_kg": round(138 * 2.5, 2),  # ~2.5 kg CO₂ saved per item
+            "water_saved_liters": round(138 * 50, 2),  # ~50L per item
+            "meals_estimated": int(138 * 0.75)
+        },
+        "category_breakdown": [
+            {"category": cat, "count": random.randint(1, 10)} for cat in categories
+        ],
+        "donation_trend": [
+            {"date": (now - timedelta(days=i)).strftime("%Y-%m-%d"), "count": random.randint(0, 3)}
+            for i in reversed(range(30))
+        ],
+        "top_items": [
+            {"title": "Banana Box", "count": 6},
+            {"title": "Milk Carton", "count": 5},
+            {"title": "Bread Loaf", "count": 3}
+        ]
+    }
+
+    return mock_data
