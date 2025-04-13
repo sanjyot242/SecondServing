@@ -34,7 +34,7 @@ const LoginForm: React.FC = () => {
     setError('');
     
     try {
-      const response = await login(email, password, userType);
+      const response = await login(email, password,userType);
       
       // Store the token in localStorage
       localStorage.setItem('token', response.token);

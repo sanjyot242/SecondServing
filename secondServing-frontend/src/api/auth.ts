@@ -1,31 +1,16 @@
+// Modified auth.ts
+
 import axios from 'axios';
 import { ShelterData, DonatorData } from '../types';
 
 const API_URL = 'http://localhost:8080'; // Replace with your FastAPI URL
 
-// Add auth token to requests if available
-axios.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// For cookie-based auth, we need to include credentials in requests
+axios.defaults.withCredentials = true;
 
 export const registerShelter = async (shelterData: ShelterData) => {
   try {
-    
-    const response = await axios.post(`${API_URL}/register`, shelterData,{
-      headers: {
-        "Content-Type": "application/json"
-      },
-      withCredentials: true
-    });
+    const response = await axios.post(`${API_URL}/register`, shelterData);
     return response.data;
   } catch (error) {
     throw error;
@@ -34,12 +19,7 @@ export const registerShelter = async (shelterData: ShelterData) => {
 
 export const registerDonator = async (donatorData: DonatorData) => {
   try {
-    const response = await axios.post(`${API_URL}/register`, donatorData, {
-      headers: {
-        "Content-Type": "application/json"
-      },
-      withCredentials: true
-    });
+    const response = await axios.post(`${API_URL}/register`, donatorData);
     return response.data;
   } catch (error) {
     throw error;
@@ -68,8 +48,7 @@ export const logout = async () => {
   try {
     const response = await axios.post(`${API_URL}/logout`);
     // Clear local storage on successful logout
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem('user_id');
     localStorage.removeItem('userType');
     return response.data;
   } catch (error) {

@@ -75,7 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const handleLogin = async (email: string, password: string, userType: string) => {
     setIsLoading(true);
     try {
-      const response = await login(email, password, userType);
+      const response = await login(email, password,userType);
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
       localStorage.setItem('userType', userType as UserType);
