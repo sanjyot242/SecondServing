@@ -11,12 +11,20 @@ interface RequestCardProps {
   title: string;
   createdDate: string;
   urgency: 'High' | 'Medium' | 'Low';
-  status: 'Active' | 'Accepted' | 'Completed';
+  status:
+    | 'Open'
+    | 'Matched'
+    | 'Fulfilled'
+    | 'Cancelled'
+    | 'Completed'
+    | 'Active'
+    | 'Accepted';
   items: RequestItem[];
   notes?: string;
-  userType: 'shelter' | 'donor';
+  userType: 'shelter' | 'donator';
   onViewDetails: () => void;
   onCancelRequest?: () => void;
+  onFulfillRequest?: () => void;
 }
 
 const RequestCard: React.FC<RequestCardProps> = ({
@@ -29,6 +37,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
   userType,
   onViewDetails,
   onCancelRequest,
+  onFulfillRequest,
 }) => {
   // Get appropriate CSS class based on urgency
   const getUrgencyClass = () => {
@@ -47,12 +56,17 @@ const RequestCard: React.FC<RequestCardProps> = ({
   // Get appropriate CSS class based on status
   const getStatusClass = () => {
     switch (status) {
+      case 'Open':
       case 'Active':
         return 'bg-cosmos-orbit text-white';
+      case 'Matched':
       case 'Accepted':
         return 'bg-cosmos-satellite text-white';
+      case 'Fulfilled':
       case 'Completed':
         return 'bg-cosmos-station-hull text-cosmos-void';
+      case 'Cancelled':
+        return 'bg-cosmos-mars text-white';
       default:
         return 'bg-cosmos-station-hull';
     }
@@ -60,6 +74,10 @@ const RequestCard: React.FC<RequestCardProps> = ({
 
   const buttonClass =
     userType === 'shelter' ? 'shelter-button' : 'donor-button';
+
+  // Normalize status for display
+  const normalizedStatus =
+    status === 'Active' ? 'Open' : status === 'Accepted' ? 'Matched' : status;
 
   return (
     <div className='backdrop-blur-md bg-white/10 border border-white/10 rounded-lg p-4'>
@@ -77,7 +95,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
           </span>
           <span
             className={`${getStatusClass()} px-3 py-1 rounded-full text-xs font-space`}>
-            {status}
+            {normalizedStatus}
           </span>
         </div>
       </div>
@@ -115,13 +133,29 @@ const RequestCard: React.FC<RequestCardProps> = ({
       )}
 
       <div className='flex justify-end space-x-3'>
-        {onCancelRequest && status === 'Active' && (
-          <button
-            onClick={onCancelRequest}
-            className='px-4 py-2 rounded-capsule border border-cosmos-mars text-cosmos-mars font-space hover:bg-cosmos-mars hover:bg-opacity-10 transition-all'>
-            Cancel Request
-          </button>
-        )}
+        {/* Cancel Request button - only shown for shelters with active requests */}
+        {userType === 'shelter' &&
+          onCancelRequest &&
+          (status === 'Open' || status === 'Active') && (
+            <button
+              onClick={onCancelRequest}
+              className='px-4 py-2 rounded-capsule border border-cosmos-mars text-cosmos-mars font-space hover:bg-cosmos-mars hover:bg-opacity-10 transition-all'>
+              Cancel Request
+            </button>
+          )}
+
+        {/* Fulfill Request button - only shown for donors with open requests */}
+        {userType === 'donator' &&
+          onFulfillRequest &&
+          (status === 'Open' || status === 'Active') && (
+            <button
+              onClick={onFulfillRequest}
+              className='px-4 py-2 rounded-capsule bg-cosmos-orbit text-white font-space hover:bg-opacity-90 transition-all'>
+              Fulfill Request
+            </button>
+          )}
+
+        {/* View Details button - always shown */}
         <button
           onClick={onViewDetails}
           className={`px-4 py-2 rounded-capsule ${buttonClass} text-sm`}>

@@ -7,7 +7,7 @@ import StatusCard from './StatusCard';
 import ActionButton from './ActionButton';
 import TabNav from './TabNav';
 import RequestCard from './RequestCard';
-import axios from "axios";
+import axios from 'axios';
 // Sample request data
 const SAMPLE_REQUESTS = [
   {
@@ -38,7 +38,7 @@ const SAMPLE_REQUESTS = [
 
 const ShelterDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const API_URL = "http://localhost:8080";
+  const API_URL = 'http://localhost:8080';
   const { user } = useAuth();
   const userName = user?.email?.split('@')[0] || 'User';
 
@@ -50,7 +50,7 @@ const ShelterDashboard: React.FC = () => {
     fetchReceiverRequests()
       .then(setRequests)
       .catch((err) => {
-        console.error("Failed to fetch requests", err);
+        console.error('Failed to fetch requests', err);
       });
   }, []);
 
@@ -61,19 +61,20 @@ const ShelterDashboard: React.FC = () => {
     return response.data;
   };
 
-  const filteredRequests = activeTab === 'All'
-  ? requests
-  : requests.filter((r: any) => r.status === activeTab);
+  const filteredRequests =
+    activeTab === 'All'
+      ? requests
+      : requests.filter((r: any) => r.status === activeTab);
 
   return (
     <>
-      <UserWelcomeCard name={`${userName} Johnson`} userType='donor' />
+      <UserWelcomeCard name={`${userName} Johnson`} userType='shelter' />
 
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-8'>
         <StatusCard
           title='Requested Deliveries'
           count={requests.length}
-          userType='donor'
+          userType='shelter'
           icon='clipboard'
         />
 
@@ -81,7 +82,7 @@ const ShelterDashboard: React.FC = () => {
           label='Request Stock'
           icon='plus'
           onClick={() => navigate('/dashboard/create-request')}
-          userType='donor'
+          userType='shelter'
         />
       </div>
 
@@ -95,24 +96,24 @@ const ShelterDashboard: React.FC = () => {
             />
 
             <div className='space-y-6'>
-            {filteredRequests.map((request: any) => (
-              <RequestCard
-                key={request.id}
-                title={request.title}
-                createdDate={new Date(request.created_at).toLocaleString()}
-                urgency={request.urgency}
-                status={request.status}
-                items={request.items}
-                notes={request.notes}
-                userType="donor"
-                onViewDetails={() =>
-                  navigate(`/dashboard/requests/${request.id}`)
-                }
-                onCancelRequest={() =>
-                  console.log(`Cancel request ${request.id}`)
-                }
-              />
-            ))}
+              {filteredRequests.map((request: any) => (
+                <RequestCard
+                  key={request.id}
+                  title={request.title}
+                  createdDate={new Date(request.created_at).toLocaleString()}
+                  urgency={request.urgency}
+                  status={request.status}
+                  items={request.items}
+                  notes={request.notes}
+                  userType='shelter'
+                  onViewDetails={() =>
+                    navigate(`/dashboard/requests/${request.id}`)
+                  }
+                  onCancelRequest={() =>
+                    console.log(`Cancel request ${request.id}`)
+                  }
+                />
+              ))}
             </div>
           </div>
         </div>

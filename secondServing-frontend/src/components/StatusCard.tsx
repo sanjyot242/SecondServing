@@ -4,7 +4,7 @@ import { HiOutlineCalendar, HiOutlineClipboardCheck } from 'react-icons/hi';
 interface StatusCardProps {
   title: string;
   count: number;
-  userType: 'shelter' | 'donor';
+  userType: 'shelter' | 'donator';
   icon?: 'calendar' | 'clipboard';
 }
 
