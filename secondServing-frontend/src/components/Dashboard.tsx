@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getCurrentUser, logout } from '../api/auth';
+import { getCurrentUser } from '../api/auth';
 
 interface UserData {
   user_id: number;
@@ -11,7 +11,7 @@ interface UserData {
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { setUserType } = useAuth();
+  const { setUserType, logout, isAuthenticated } = useAuth();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -36,14 +36,22 @@ const Dashboard: React.FC = () => {
       }
     };
 
-    fetchUserData();
-  }, [navigate, setUserType]);
+    if (isAuthenticated) {
+      fetchUserData();
+    } else {
+      setIsLoading(false);
+    }
+  }, [navigate, setUserType, isAuthenticated]);
   
   const handleSignOut = async () => {
     try {
-      // This will clear the access_token cookie
+      // Perform the logout operation
       await logout();
-      navigate('/');
+      
+      // Add a small delay before navigation to ensure logout is processed
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
     } catch (error) {
       console.error('Logout failed:', error);
     }
