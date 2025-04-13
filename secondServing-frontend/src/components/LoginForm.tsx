@@ -54,9 +54,9 @@ const LoginForm: React.FC = () => {
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 space-container">
       <div className="max-w-md w-full backdrop-blur-md bg-white/30 rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Sign In</h1>
-          <p className="text-gray-600 mt-2">
-            {localUserType === 'shelter' 
+          <h1 className="text-3xl font-bold text-gray-800 space-header">Sign In</h1>
+          <p className="text-gray-600 mt-2 space-subheader">
+            {userType === 'shelter' 
               ? 'Access your shelter account' 
               : 'Access your donor account'}
           </p>
@@ -120,8 +120,8 @@ const LoginForm: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-4 text-white font-medium rounded-lg transition duration-150 disabled:bg-gray-400 ${
-              localUserType === 'shelter' ? 'bg-teal-600 hover:bg-teal-700' : 'bg-blue-600 hover:bg-blue-700'
+            className={`w-full py-3 px-4 text-white font-medium rounded-lg transition duration-150 disabled:bg-gray-400 glow-effect space-button-ghost ${
+              userType === 'shelter' ? 'bg-teal-600 hover:bg-teal-700' : 'bg-teal-600 hover:bg-teal-700'
             }`}
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
