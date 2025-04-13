@@ -1,9 +1,9 @@
 export interface ShelterData {
     name: string;
     location: string;
-    volunteerEmails: string[];
+    email:string
     password: string;
-    contactNumber: string;
+    contactInfo: string;
     role: string;
     
   }

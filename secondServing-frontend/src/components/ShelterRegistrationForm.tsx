@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ShelterData } from '../types';
-import { registerShelter } from '../api/auth';
+import { useAuth } from '../context/AuthContext';
 
 const ShelterRegistrationForm: React.FC = () => {
   const navigate = useNavigate();
+  const { registerShelter } = useAuth();
+  
   const [formData, setFormData] = useState<ShelterData>({
     name: '',
     location: '',
-    volunteerEmails: [''],
+    email: '',
     password: '',
-    contactNumber: '',
+    contactInfo: '',
     role: 'receiver'
   });
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,27 +22,6 @@ const ShelterRegistrationForm: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  };
-
-  const handleVolunteerEmailChange = (index: number, value: string) => {
-    const updatedEmails = [...formData.volunteerEmails];
-    updatedEmails[index] = value;
-    setFormData({ ...formData, volunteerEmails: updatedEmails });
-  };
-
-  const addVolunteerEmail = () => {
-    setFormData({
-      ...formData,
-      volunteerEmails: [...formData.volunteerEmails, '']
-    });
-  };
-
-  const removeVolunteerEmail = (index: number) => {
-    if (formData.volunteerEmails.length > 1) {
-      const updatedEmails = [...formData.volunteerEmails];
-      updatedEmails.splice(index, 1);
-      setFormData({ ...formData, volunteerEmails: updatedEmails });
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,13 +36,7 @@ const ShelterRegistrationForm: React.FC = () => {
     setError('');
 
     try {
-      const response = await registerShelter(formData);
-      
-      // Store token and user info
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      
-      // Redirect to dashboard
+      await registerShelter(formData);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Registration failed');
@@ -117,47 +92,30 @@ const ShelterRegistrationForm: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Volunteer Emails
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email
             </label>
-            {formData.volunteerEmails.map((email, index) => (
-              <div key={index} className="flex mb-2">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => handleVolunteerEmailChange(index, e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 shelter-input placeholder-gray-500"
-                  placeholder="volunteer@example.com"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeVolunteerEmail(index)}
-                  className="ml-2 px-2 text-red-500 hover:text-red-700"
-                  disabled={formData.volunteerEmails.length <= 1}
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={addVolunteerEmail}
-              className="text-sm text-teal-800 hover:text-teal-900"
-            >
-              + Add another email
-            </button>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              value={formData.email}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 shelter-input"
+            />
           </div>
 
           <div>
-            <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="contactInfo" className="block text-sm font-medium text-gray-700 mb-1">
               Contact Number
             </label>
             <input
-              id="contactNumber"
-              name="contactNumber"
+              id="contactInfo"
+              name="contactInfo"
               type="tel"
               required
-              value={formData.contactNumber}
+              value={formData.contactInfo}
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 shelter-input"
             />

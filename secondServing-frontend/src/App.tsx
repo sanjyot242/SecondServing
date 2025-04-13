@@ -9,7 +9,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import LandingPage from './components/LandingPage'; // Import LandingPage component
+import LandingPage from './components/LandingPage';
+
 
 const App: React.FC = () => {
   return (
