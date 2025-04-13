@@ -9,7 +9,7 @@ from config.logging_config import get_logger
 from config.database import get_db
 from models import UserCreate, Token, FoodItemCreate, FoodItemOut, RequestOut, RequestCreate
 from schema import User
-from crud import create_user, get_user_by_email, create_new_food_item, get_available_food_items, create_request
+from crud import create_user, get_user_by_email, create_new_food_item, get_active_inventory, create_request, match_requests_to_food_items, mark_expired_food_items_as_fulfilled, mark_food_as_fulfilled
 from auth import authenticate_user, create_access_token, get_current_user, set_auth_cookie, get_password_hash
 from fastapi.responses import JSONResponse
 
@@ -92,7 +92,7 @@ async def get_authenticated_user(current_user: User = Depends(get_current_user))
 
 
 
-################## FOOD ITEM ENDPOINTS #######################
+################## FOOD ITEM ENDPOINT #######################
 
 @app_router.post("/add-food", response_model=FoodItemOut)
 def create_food_item(
@@ -114,6 +114,9 @@ def create_food_item(
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
     
 
+
+
+############## REQUEST & MATCHING ENDPOINTS #######################
 @app_router.post("/requests", response_model=RequestOut)
 def submit_food_request(
     request_data: RequestCreate,
@@ -128,23 +131,56 @@ def submit_food_request(
 
 
 
-@app_router.get("/food/recommendations", response_model=List[FoodItemOut])
-def get_recommended_food(
+@app_router.post("/match")
+def run_matching(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    if user.role != "provider":
+        return {"message": "Only providers can trigger matching."}
+
+    result = match_requests_to_food_items(db)
+    return {
+        "message": f"{len(result)} match(es) created.",
+        "matches": result
+    }
+
+
+
+
+############### PROVIDER ENDPOINTS #######################
+@app_router.patch("/mark-expired")
+def auto_expire_food(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    user=Depends(get_current_user)
 ):
-    try:
-        if current_user.role != "receiver":
-            raise HTTPException(status_code=403, detail="Only receivers can view recommendations")
+    if user.role != "provider":
+        return {"message": "Only providers can update food status."}
 
-        now = datetime.utcnow()
+    expired = mark_expired_food_items_as_fulfilled(db)
+    return {
+        "message": f"{len(expired)} expired item(s) marked as fulfilled.",
+        "expired_food_ids": expired
+    }
 
-        food_items = get_available_food_items(db, now, current_user.preferences)
 
-        return food_items
-    except HTTPException as http_exc:
-        logger.error(f"HTTPException: {http_exc.detail}")
-        raise http_exc
-    except Exception as exc:
-        logger.error(f"An unexpected error occurred: {exc}")
-        raise HTTPException(status_code=500, detail="An unexpected error occurred")
+@app_router.patch("/food/{food_id}/fulfill")
+def fulfill_food_item(
+    food_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    if user.role != "provider":
+        return {"message": "Only providers can fulfill food items."}
+
+    result = mark_food_as_fulfilled(food_id, db)
+    return result
+
+
+@app_router.get("/inventory/active")
+def load_active_inventory(
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    if user.role != "provider":
+        return {"message": "Only providers have an active inventory."}
+
+    inventory = get_active_inventory(db, user.id)
+    return {"inventory": inventory}

@@ -1,7 +1,7 @@
 # For all the database CRUD operations
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, or_, case
 from models import UserCreate, FoodItemCreate, RequestCreate
 from schema import User, FoodItem, Request
 
@@ -48,9 +48,7 @@ def get_available_food_items(db: Session, time: datetime, preferences: str):
         FoodItem.available_until >= time
     )
 
-    # Optional: filter based on preferences
     if preferences:
-        # Basic example: filter by preferred cuisine type in description
         preferred_keywords = preferences.get("cuisine")
         if preferred_keywords:
             query = query.filter(FoodItem.description.ilike(f"%{preferred_keywords}%"))
@@ -76,3 +74,126 @@ def create_request(db: Session, receiver_id: int, request_data: RequestCreate):
     db.commit()
     db.refresh(new_request)
     return new_request
+
+
+def match_requests_to_food_items(db: Session):
+    matches = []
+
+    urgency_order = case(
+        (Request.urgency == "high", 1),
+        (Request.urgency == "medium", 2),
+        (Request.urgency == "low", 3),
+        else_=4
+    )
+
+    open_requests = db.query(Request)\
+        .filter(Request.status == "open")\
+        .order_by(urgency_order)\
+        .all()
+
+    for req in open_requests:
+        query = db.query(FoodItem).filter(
+            FoodItem.status == "available",
+            FoodItem.category == req.category,
+            FoodItem.quantity >= req.quantity,
+            or_(
+                FoodItem.title.ilike(f"%{req.requested_item}%"),
+                FoodItem.description.ilike(f"%{req.requested_item}%")
+            )
+        )
+
+        if req.needed_by:
+            query = query.filter(FoodItem.expiry >= req.needed_by)
+
+        match = query.first()
+
+        if match:
+            # Update both sides
+            req.status = "matched"
+            req.matched_item_id = match.id
+            match.status = "matched"
+
+            db.add_all([req, match])
+            matches.append({
+                "request_id": req.id,
+                "matched_food_id": match.id,
+                "requested_item": req.requested_item,
+                "matched_food_title": match.title,
+                "urgency": req.urgency
+            })
+
+    db.commit()
+    return matches
+
+
+def mark_expired_food_items_as_fulfilled(db: Session):
+    now = datetime.utcnow()
+
+    expired_items = db.query(FoodItem).filter(
+        FoodItem.status.in_(["matched", "available"]),
+        FoodItem.expiry < now
+    ).all()
+
+    updated_ids = []
+    for item in expired_items:
+        item.status = "fulfilled"
+        updated_ids.append(item.id)
+
+    db.commit()
+    return updated_ids
+
+
+def mark_food_as_fulfilled(food_id: int, db: Session):
+    food = db.query(FoodItem).filter(FoodItem.id == food_id).first()
+
+    if not food:
+        return {"error": "Food item not found."}
+
+    if food.status != "matched":
+        return {"error": "Only matched items can be marked as fulfilled."}
+
+    food.status = "fulfilled"
+
+    request = db.query(Request).filter(Request.matched_item_id == food.id).first()
+    if request:
+        request.status = "fulfilled"
+        db.add(request)
+
+    db.add(food)
+    db.commit()
+
+    return {"message": "Food and request marked as fulfilled."}
+
+
+def get_active_inventory(db: Session, provider_id: int):
+    now = datetime.utcnow()
+    soon = now + timedelta(hours=48)
+
+    items = db.query(FoodItem).filter(
+        FoodItem.provider_id == provider_id,
+        FoodItem.status.in_(["available", "matched"])
+    ).all()
+
+    result = []
+    for item in items:
+        condition = []
+
+        if item.expiry < now:
+            condition.append("expired")
+        elif item.expiry <= soon:
+            condition.append("expiring_soon")
+        else:
+            condition.append("fresh")
+
+        if item.quantity < 3:
+            condition.append("low_quantity")
+
+        result.append({
+            "id": item.id,
+            "title": item.title,
+            "category": item.category,
+            "condition": ", ".join(condition),
+            "available_until": item.available_until
+        })
+
+    return result

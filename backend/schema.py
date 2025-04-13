@@ -59,7 +59,7 @@ class Request(Base):
     is_recurring = Column(Boolean, default=False)
     notes = Column(Text)
     matched_item_id = Column(Integer, ForeignKey("food_items.id"), nullable=True)
-    status = Column(String(20), default="open")  # open, matched, fulfilled, cancelled
+    status = Column(String(20), default="open")  # open, matched, fulfilled, cancelled, completed
     created_at = Column(DateTime, server_default=func.now())
 
     receiver = relationship("User", back_populates="food_requests")
@@ -78,5 +78,4 @@ class Feedback(Base):
     rating = Column(Integer, nullable=False)  # 1 to 5
     comments = Column(Text)
     created_at = Column(DateTime, server_default=func.now())
-
     request = relationship("Request", back_populates="feedback")
