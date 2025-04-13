@@ -15,7 +15,14 @@
 .space-container2 {
   @apply min-h-screen bg-cover bg-center bg-no-repeat;
   background-image: url('../../public/Images/LandingPage.png');
+  background-size: 100% auto; /* Stretch the width, keep the height proportional */
+  background-position: center center; /* Center the image */
 }
+
+.text-shadow-lg {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4);
+}
+
 
 .space-header {
   @apply font-future text-white uppercase tracking-wider;

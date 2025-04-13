@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { UserType } from '../types';
 import { useAuth } from '../context/AuthContext';
-import { motion } from 'framer-motion';
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
@@ -49,17 +48,6 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <motion.div
-      initial={{ x: '100%' }}  // Start off-screen to the right
-      animate={{ x: 0 }}       // Animate to center position
-      exit={{ x: '-100%' }}     // Move to the left (off-screen) when navigating away
-      transition={{
-        type: 'spring',
-        stiffness: 100,
-        damping: 25,
-        duration: 1
-      }}
-    >
       <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 space-container">
         <div className="max-w-md w-full backdrop-blur-md bg-white/30 rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
@@ -159,7 +147,7 @@ const LoginForm: React.FC = () => {
           </div>
         </div>
       </div>
-    </motion.div>
+
   );
 };
 
