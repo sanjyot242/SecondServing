@@ -1,13 +1,15 @@
 #ALl the endpoints will be defined here
 
+from datetime import datetime
+from typing import List
 from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from config.logging_config import get_logger
 from config.database import get_db
-from models import UserCreate, Token
+from models import UserCreate, Token, FoodItemCreate, FoodItemOut, RequestOut, RequestCreate
 from schema import User
-from crud import create_user, get_user_by_email
+from crud import create_user, get_user_by_email, create_new_food_item, get_available_food_items, create_request
 from auth import authenticate_user, create_access_token, get_current_user, set_auth_cookie, get_password_hash
 from fastapi.responses import JSONResponse
 
@@ -87,3 +89,62 @@ async def get_authenticated_user(current_user: User = Depends(get_current_user))
         "email": current_user.email,
         "role": current_user.role
     }
+
+
+
+################## FOOD ITEM ENDPOINTS #######################
+
+@app_router.post("/add-food", response_model=FoodItemOut)
+def create_food_item(
+    food_data: FoodItemCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    try:
+        if current_user.role != "provider":
+            raise HTTPException(status_code=403, detail="Only providers can post food items")
+
+        food_item = create_new_food_item(db, food_data, current_user.id)
+        return food_item
+    except HTTPException as http_exc:
+        logger.error(f"HTTPException: {http_exc.detail}")
+        raise http_exc
+    except Exception as exc:
+        logger.error(f"An unexpected error occurred: {exc}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred")
+    
+
+@app_router.post("/requests", response_model=RequestOut)
+def submit_food_request(
+    request_data: RequestCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "receiver":
+        raise HTTPException(status_code=403, detail="Only receivers can submit requests")
+
+    return create_request(db, current_user.id, request_data)
+
+
+
+
+@app_router.get("/food/recommendations", response_model=List[FoodItemOut])
+def get_recommended_food(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    try:
+        if current_user.role != "receiver":
+            raise HTTPException(status_code=403, detail="Only receivers can view recommendations")
+
+        now = datetime.utcnow()
+
+        food_items = get_available_food_items(db, now, current_user.preferences)
+
+        return food_items
+    except HTTPException as http_exc:
+        logger.error(f"HTTPException: {http_exc.detail}")
+        raise http_exc
+    except Exception as exc:
+        logger.error(f"An unexpected error occurred: {exc}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred")
