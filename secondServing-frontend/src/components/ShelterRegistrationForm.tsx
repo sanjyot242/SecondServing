@@ -1,16 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { ShelterData } from '../types';
 import { registerShelter } from '../api/auth';
 
-interface ShelterRegistrationFormProps {
-  onRegistrationSuccess: () => void;
-  switchToLogin: () => void;
-}
-
-const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
-  onRegistrationSuccess,
-  switchToLogin
-}) => {
+const ShelterRegistrationForm: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<ShelterData>({
     name: '',
     location: '',
@@ -61,8 +55,14 @@ const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
     setError('');
 
     try {
-      await registerShelter(formData);
-      onRegistrationSuccess();
+      const response = await registerShelter(formData);
+      
+      // Store token and user info
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      
+      // Redirect to dashboard
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Registration failed');
     } finally {
@@ -112,7 +112,6 @@ const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
               value={formData.location}
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 shelter-input placeholder-gray-500"
-
               placeholder="Full address"
             />
           </div>
@@ -207,12 +206,12 @@ const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
         <div className="mt-4 text-center">
           <p className="text-gray-700">
             Already have an account?{' '}
-            <button
-              onClick={switchToLogin}
+            <Link
+              to="/login?type=shelter"
               className="text-teal-800 hover:text-teal-900 font-medium"
             >
               Sign in
-            </button>
+            </Link>
           </p>
         </div>
       </div>
