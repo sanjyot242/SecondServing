@@ -1,13 +1,12 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { checkAuthStatus, login, logout } from '../api/auth';
-import { UserType } from '../types';
+import { getCurrentUser, login, logout, registerShelter, registerDonator } from '../api/auth';
+import { UserType, ShelterData, DonatorData } from '../types';
 
 interface User {
-  id: string;
-  name: string;
-  role: string;
-  email?: string;
-  [key: string]: any;
+  user_id: number;
+  email: string;
+  role: 'provider' | 'receiver';
+
 }
 
 interface AuthContextType {
@@ -15,9 +14,12 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   userType: UserType | null;
-  login: (email: string, password: string, userType: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  registerShelter: (data: ShelterData) => Promise<void>;
+  registerDonator: (data: DonatorData) => Promise<void>;
   setUserType: (type: UserType) => void;
+  checkAuthStatus: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,39 +33,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [userType, setUserType] = useState<UserType | null>(null);
 
+  // Initialize stored user type
   useEffect(() => {
-    // Check if user is already authenticated on app load
+    const storedType = localStorage.getItem('userType') as UserType;
+    if (storedType) {
+      setUserType(storedType);
+    }
+  }, []);
+
+  // Initial auth check
+  useEffect(() => {
     const checkAuth = async () => {
       setIsLoading(true);
       try {
-        // Check local storage first
-        const storedUser = localStorage.getItem('user');
-        const storedType = localStorage.getItem('userType') as UserType;
+        const userData = await getCurrentUser();
+        setUser(userData);
         
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-          if (storedType) {
-            setUserType(storedType);
-          }
-        } else {
-          // Fallback to API check (if token exists)
-          const token = localStorage.getItem('token');
-          if (token) {
-            const userData = await checkAuthStatus();
-            setUser(userData);
-            // Set user type based on role if available
-            if (userData.role === 'donor') {
-              setUserType('donator');
-            } else if (userData.role === 'receiver') {
-              setUserType('shelter');
-            }
-          }
+        // Set user type based on role
+        if (userData.role === 'provider') {
+          setUserType('donator');
+        } else if (userData.role === 'receiver') {
+          setUserType('shelter');
         }
       } catch (error) {
-        console.error('Authentication check failed:', error);
-        // Clear potentially invalid data
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        // Not authenticated, clear user data
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
@@ -72,15 +66,56 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
-  const handleLogin = async (email: string, password: string, userType: string) => {
+  // Reusable function to check authentication status
+  const checkAuthStatus = async (): Promise<boolean> => {
+    try {
+      const userData = await getCurrentUser();
+      setUser(userData);
+      
+      // Set user type based on role
+      if (userData.role === 'provider') {
+        setUserType('donator');
+      } else if (userData.role === 'receiver') {
+        setUserType('shelter');
+      }
+      
+      return true;
+    } catch (error) {
+      // Not authenticated
+      setUser(null);
+      return false;
+    }
+  };
+
+  const handleLogin = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await login(email, password, userType);
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      localStorage.setItem('userType', userType as UserType);
-      setUser(response.user);
-      setUserType(userType as UserType);
+      await login(email, password);
+      await checkAuthStatus();
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRegisterShelter = async (data: ShelterData) => {
+    setIsLoading(true);
+    try {
+      await registerShelter(data);
+      await checkAuthStatus();
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRegisterDonator = async (data: DonatorData) => {
+    setIsLoading(true);
+    try {
+      await registerDonator(data);
+      await checkAuthStatus();
     } catch (error) {
       throw error;
     } finally {
@@ -92,15 +127,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       await logout();
+      setUser(null);
+      // We keep the userType for UX purposes
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
-      // Always clear local data regardless of API success
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('userType');
-      setUser(null);
-      setUserType(null);
       setIsLoading(false);
     }
   };
@@ -117,7 +148,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     userType,
     login: handleLogin,
     logout: handleLogout,
+    registerShelter: handleRegisterShelter,
+    registerDonator: handleRegisterDonator,
     setUserType: handleSetUserType,
+    checkAuthStatus,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

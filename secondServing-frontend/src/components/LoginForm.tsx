@@ -1,32 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { UserType } from '../types';
-import { login } from '../api/auth';
+import { useAuth } from '../context/AuthContext';
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [userType, setUserType] = useState<UserType>('shelter');
+  const { login, userType, setUserType } = useAuth();
+    
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [localUserType, setLocalUserType] = useState<UserType>(userType || 'shelter');
 
-  // Get the userType from localStorage when component mounts
+  // Update userType from query params if present
   useEffect(() => {
-    const storedUserType = localStorage.getItem('userType') as UserType;
-    if (storedUserType) {
-      setUserType(storedUserType);
-    }
-    
-    // Check if there's a userType in query params
     const params = new URLSearchParams(location.search);
     const typeFromParams = params.get('type') as UserType;
+    
     if (typeFromParams && (typeFromParams === 'shelter' || typeFromParams === 'donator')) {
+      setLocalUserType(typeFromParams);
       setUserType(typeFromParams);
-      localStorage.setItem('userType', typeFromParams);
     }
-  }, [location]);
+  }, [location, setUserType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,25 +31,20 @@ const LoginForm: React.FC = () => {
     setError('');
     
     try {
-      const response = await login(email, password, userType);
-      
-      // Store the token in localStorage
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      
-      // Redirect to dashboard
+      await login(email, password);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Login failed');
+      setError(err.response?.data?.detail || 'Login failed. Please check your credentials.');
+      setError(err.response?.data?.detail || 'Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const switchUserType = () => {
-    const newUserType = userType === 'shelter' ? 'donator' : 'shelter';
+    const newUserType = localUserType === 'shelter' ? 'donator' : 'shelter';
+    setLocalUserType(newUserType);
     setUserType(newUserType);
-    localStorage.setItem('userType', newUserType);
   };
 
   return (
@@ -137,9 +129,9 @@ const LoginForm: React.FC = () => {
           <p className="text-gray-600">
             Don't have an account?{' '}
             <Link 
-              to={`/register/${userType}`}
+              to={`/register/${localUserType}`}
               className={`font-medium ${
-                userType === 'shelter' ? 'text-teal-600 hover:text-teal-800' : 'text-blue-600 hover:text-blue-800'
+                localUserType === 'shelter' ? 'text-teal-600 hover:text-teal-800' : 'text-blue-600 hover:text-blue-800'
               }`}
             >
               Register
@@ -150,7 +142,7 @@ const LoginForm: React.FC = () => {
             onClick={switchUserType}
             className="mt-2 text-sm text-gray-600 hover:text-gray-800"
           >
-            I'm a {userType === 'shelter' ? 'Donor' : 'Shelter'} instead
+            I'm a {localUserType === 'shelter' ? 'Donor' : 'Shelter'} instead
           </button>
         </div>
       </div>

@@ -41,6 +41,15 @@ const UserTypeSelection: React.FC = () => {
             >
               Food Donor
             </button>
+            
+            <div className="text-center pt-4">
+              <button 
+                onClick={() => navigate('/login')}
+                className="text-gray-800 hover:text-gray-600 text-sm underline"
+              >
+                Already have an account? Sign in
+              </button>
+            </div>
           </div>
         </div>
       </div>

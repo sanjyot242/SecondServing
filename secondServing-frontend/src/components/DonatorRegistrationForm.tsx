@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { DonatorData } from '../types';
-import { registerDonator } from '../api/auth';
+import { useAuth } from '../context/AuthContext';
 
 const DonatorRegistrationForm: React.FC = () => {
   const navigate = useNavigate();
+  const { registerDonator } = useAuth();
+  
   const [formData, setFormData] = useState<DonatorData>({
     name: '',
     location: '',
@@ -37,13 +39,7 @@ const DonatorRegistrationForm: React.FC = () => {
     setError('');
     
     try {
-      const response = await registerDonator(formData);
-      
-      // Store token and user info
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      
-      // Redirect to dashboard
+      await registerDonator(formData);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Registration failed');

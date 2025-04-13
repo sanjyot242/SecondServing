@@ -9,7 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import LandingPage from './components/LandingPage'; // Import LandingPage component
+import LandingPage from './components/LandingPage';
 import PostSurplusFoodForm from './components/PostSurplusFoodForm';
 
 const App: React.FC = () => {
@@ -56,7 +56,7 @@ const AppContent: React.FC = () => {
         {/* Public routes */}
         <Route 
           path="/register/shelter" 
-          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <PostSurplusFoodForm />} 
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <ShelterRegistrationForm />} 
         />
         <Route 
           path="/register/donator" 
