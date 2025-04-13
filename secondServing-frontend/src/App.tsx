@@ -5,6 +5,7 @@ import DonatorRegistrationForm from './components/DonatorRegistrationForm';
 import LoginForm from './components/LoginForm';
 import { UserType } from './types';
 
+
 enum AuthStage {
   SELECT_USER_TYPE,
   REGISTER,
