@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import UserWelcomeCard from './UserWelcomeCard';
 import StatusCard from './StatusCard';
@@ -7,87 +7,33 @@ import ActionButton from './ActionButton';
 import InventoryTable from './InventoryTable';
 import axios from 'axios';
 
-// Sample inventory data
-const SAMPLE_INVENTORY = [
-  {
-    name: 'Bread',
-    type: 'Baked Goods',
-    condition: 'Critical' as const,
-    tags: ['No Nuts'],
-  },
-  {
-    name: 'Apples',
-    type: 'Produce',
-    condition: 'Good' as const,
-    tags: ['No Nuts', 'Gluten Free'],
-  },
-  {
-    name: 'Canned Soup',
-    type: 'Canned Goods',
-    condition: 'Good' as const,
-    tags: ['No Nuts', 'Vegan'],
-  },
-  {
-    name: 'Rice',
-    type: 'Grains',
-    condition: 'Good' as const,
-    tags: ['Gluten Free', 'Vegan'],
-  },
-  {
-    name: 'Milk',
-    type: 'Dairy',
-    condition: 'Critical' as const,
-    tags: ['No Nuts'],
-  },
-  {
-    name: 'Pasta',
-    type: 'Dry Goods',
-    condition: 'Good' as const,
-    tags: ['Vegetarian'],
-  },
-  {
-    name: 'Bananas',
-    type: 'Produce',
-    condition: 'Waste' as const,
-    tags: ['Gluten Free', 'Vegan'],
-  },
-  {
-    name: 'Yogurt',
-    type: 'Dairy',
-    condition: 'Critical' as const,
-    tags: ['Vegetarian', 'Probiotic'],
-  },
-  {
-    name: 'Canned Beans',
-    type: 'Canned Goods',
-    condition: 'Good' as const,
-    tags: ['Vegan', 'Kosher'],
-  },
-  {
-    name: 'Cereal',
-    type: 'Dry Goods',
-    condition: 'Good' as const,
-    tags: ['No Nuts', 'Kosher'],
-  },
-];
-
 const DonorDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const API_URL = 'http://localhost:8080';
   const { user } = useAuth();
   const userName = user?.email?.split('@')[0] || 'User';
   const [inventory, setInventory] = useState([]);
-  useEffect(() => {
-    fetchActiveInventory().then(setInventory).catch(console.error);
-    //take match method
-  }, [location.pathname]);
 
-  const fetchActiveInventory = async () => {
-    const response = await axios.get(`${API_URL}/inventory/active`, {
-      withCredentials: true,
-    });
-    return response.data.inventory;
-  };
+  useEffect(() => {
+    const triggerMatchingAndLoadInventory = async () => {
+      try {
+        // 1. Run the matching logic
+        await axios.post(`${API_URL}/match`, {}, { withCredentials: true });
+
+        // 2. Load the inventory after matching
+        const response = await axios.get(`${API_URL}/inventory/active`, {
+          withCredentials: true,
+        });
+
+        setInventory(response.data.inventory);
+      } catch (error) {
+        console.error("Error in matching or fetching inventory", error);
+      }
+    };
+
+    triggerMatchingAndLoadInventory();
+  }, [location.pathname]);
 
   return (
     <>

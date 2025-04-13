@@ -5,9 +5,9 @@ from sqlalchemy import select, or_, case
 from fastapi import HTTPException
 from models import UserCreate, FoodItemCreate, RequestCreate, FeedbackCreate
 from schema import User, FoodItem, Request, Feedback
-from sentence_transformers import SentenceTransformer, util
+# from sentence_transformers import SentenceTransformer, util
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+#model = SentenceTransformer('all-MiniLM-L6-v2')
 
 def create_user(db: Session, user_data: UserCreate, hashed_password: str):
     """Create a new user with auth info"""
@@ -82,7 +82,6 @@ def create_request(db: Session, receiver_id: int, request_data: RequestCreate):
 
 def match_requests_to_food_items(db: Session):
     matches = []
-
     urgency_order = case(
         (Request.urgency == "high", 1),
         (Request.urgency == "medium", 2),
@@ -96,7 +95,7 @@ def match_requests_to_food_items(db: Session):
         .all()
 
     for req in open_requests:
-        query = db.query(FoodItem).filter(
+        potential_match = db.query(FoodItem).filter(
             FoodItem.status == "available",
             FoodItem.category == req.category,
             FoodItem.quantity >= req.quantity,
@@ -104,27 +103,15 @@ def match_requests_to_food_items(db: Session):
                 FoodItem.title.ilike(f"%{req.requested_item}%"),
                 FoodItem.description.ilike(f"%{req.requested_item}%")
             )
-        )
+        ).first()
 
-        # if req.needed_by:
-        #     query = query.filter(FoodItem.expiry >= req.needed_by)
-
-        match = query.first()
-
-        if match:
-            # Update both sides
+        if potential_match:
             req.status = "matched"
-            req.matched_item_id = match.id
-            match.status = "matched"
+            req.matched_item_id = potential_match.id
 
-            db.add_all([req, match])
-            matches.append({
-                "request_id": req.id,
-                "matched_food_id": match.id,
-                "requested_item": req.requested_item,
-                "matched_food_title": match.title,
-                "urgency": req.urgency
-            })
+            potential_match.status = "matched"
+
+            db.add_all([req, potential_match])
 
     db.commit()
     return matches
@@ -250,45 +237,45 @@ def get_requests_for_receiver(db: Session, receiver_id: int):
 
     return results
 
-def match_requests_to_food_items_ai(db: Session, similarity_threshold: float = 0.5):
-    from schema import FoodItem, Request
-    import torch
+# def match_requests_to_food_items_ai(db: Session, similarity_threshold: float = 0.5):
+#     from schema import FoodItem, Request
+#     import torch
 
-    matches = []
+#     matches = []
 
-    open_requests = db.query(Request).filter(Request.status == "open").all()
-    food_items = db.query(FoodItem).filter(FoodItem.status == "available").all()
+#     open_requests = db.query(Request).filter(Request.status == "open").all()
+#     food_items = db.query(FoodItem).filter(FoodItem.status == "available").all()
 
-    if not open_requests or not food_items:
-        return matches
+#     if not open_requests or not food_items:
+#         return matches
 
-    food_texts = [f"{item.title} {item.description or ''}" for item in food_items]
-    food_embeddings = model.encode(food_texts, convert_to_tensor=True)
+#     food_texts = [f"{item.title} {item.description or ''}" for item in food_items]
+#     food_embeddings = model.encode(food_texts, convert_to_tensor=True)
 
-    for req in open_requests:
-        req_text = f"{req.requested_item} {req.notes or ''}"
-        req_embedding = model.encode(req_text, convert_to_tensor=True)
+#     for req in open_requests:
+#         req_text = f"{req.requested_item} {req.notes or ''}"
+#         req_embedding = model.encode(req_text, convert_to_tensor=True)
 
-        cosine_scores = util.cos_sim(req_embedding, food_embeddings)[0]
+#         cosine_scores = util.cos_sim(req_embedding, food_embeddings)[0]
 
-        best_idx = torch.argmax(cosine_scores).item()
-        best_score = cosine_scores[best_idx].item()
+#         best_idx = torch.argmax(cosine_scores).item()
+#         best_score = cosine_scores[best_idx].item()
 
-        if best_score >= similarity_threshold:
-            matched_food = food_items[best_idx]
+#         if best_score >= similarity_threshold:
+#             matched_food = food_items[best_idx]
 
-            req.status = "matched"
-            req.matched_item_id = matched_food.id
-            matched_food.status = "matched"
+#             req.status = "matched"
+#             req.matched_item_id = matched_food.id
+#             matched_food.status = "matched"
 
-            db.add_all([req, matched_food])
-            matches.append({
-                "request_id": req.id,
-                "matched_food_id": matched_food.id,
-                "similarity": round(best_score, 3),
-                "requested_item": req.requested_item,
-                "matched_food_title": matched_food.title,
-            })
+#             db.add_all([req, matched_food])
+#             matches.append({
+#                 "request_id": req.id,
+#                 "matched_food_id": matched_food.id,
+#                 "similarity": round(best_score, 3),
+#                 "requested_item": req.requested_item,
+#                 "matched_food_title": matched_food.title,
+#             })
 
-    db.commit()
-    return matches
+#     db.commit()
+#     return matches

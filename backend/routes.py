@@ -10,7 +10,7 @@ from config.logging_config import get_logger
 from config.database import get_db
 from models import UserCreate, Token, FoodItemCreate, FoodItemOut, RequestOut, RequestCreate, FeedbackOut, FeedbackCreate, ShelterRequestOut
 from schema import User
-from crud import create_user, get_user_by_email, create_new_food_item, get_active_inventory, create_request, match_requests_to_food_items, mark_expired_food_items_as_fulfilled, mark_food_as_fulfilled, submit_feedback, get_requests_for_receiver, match_requests_to_food_items_ai
+from crud import create_user, get_user_by_email, create_new_food_item, get_active_inventory, create_request, match_requests_to_food_items, mark_expired_food_items_as_fulfilled, mark_food_as_fulfilled, submit_feedback, get_requests_for_receiver#, match_requests_to_food_items_ai
 from auth import authenticate_user, create_access_token, get_current_user, set_auth_cookie, get_password_hash
 from fastapi.responses import JSONResponse
 
@@ -179,12 +179,12 @@ def run_matching(db: Session = Depends(get_db), user=Depends(get_current_user)):
     if user.role != "provider":
         return {"message": "Only providers can trigger matching."}
 
-    result = match_requests_to_food_items(db)
+    result = match_requests_to_food_items(db) or []  # fallback to empty list if None
+
     return {
         "message": f"{len(result)} match(es) created.",
         "matches": result
     }
-
 
 
 
@@ -353,13 +353,13 @@ async def get_donation_analytics(current_user: User = Depends(get_current_user))
     return mock_data
 
 ########################## AI Matching ENDPOINTS ###########################
-@app_router.post("/match-ai")
-def run_ai_matching(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    if user.role != "provider":
-        return {"message": "Only providers can trigger matching."}
+# @app_router.post("/match-ai")
+# def run_ai_matching(db: Session = Depends(get_db), user=Depends(get_current_user)):
+#     if user.role != "provider":
+#         return {"message": "Only providers can trigger matching."}
 
-    result = match_requests_to_food_items_ai(db)
-    return {
-        "message": f"{len(result)} AI match(es) created.",
-        "matches": result
-    }
+#     result = match_requests_to_food_items_ai(db)
+#     return {
+#         "message": f"{len(result)} AI match(es) created.",
+#         "matches": result
+#     }

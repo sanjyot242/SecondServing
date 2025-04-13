@@ -53,6 +53,26 @@ food_items = [
         "available_from": datetime.utcnow() - timedelta(hours=1),
         "available_until": datetime.utcnow() + timedelta(hours=6),
         "pickup_location": "123 Market St"
+    },
+    {
+        "title":"Bread Loaf",
+        "description":"Whole grain bread",
+        "category":"Baked Goods",
+        "quantity":2,
+        "expiry":datetime.utcnow() + timedelta(hours=6),
+        "available_from":datetime.utcnow(),
+        "available_until":datetime.utcnow() + timedelta(hours=4),
+        "pickup_location":"123 Market St"
+    },
+    {
+        "title":"Canned Beans",
+        "description":"High protein black beans",
+        "category":"Canned Goods",
+        "quantity":15,
+        "expiry":datetime.utcnow() + timedelta(days=10),
+        "available_from":datetime.utcnow(),
+        "available_until":datetime.utcnow() + timedelta(days=2),
+        "pickup_location":"123 Market St"
     }
 ]
 
@@ -77,6 +97,26 @@ requests = [
         "needed_by": datetime.utcnow() + timedelta(days=2),
         "is_recurring": False,
         "notes": "Non-fat preferred"
+    },
+    {
+        "title":"Weekly canned goods restock",
+        "requested_item":"Canned Beans",
+        "category":"Canned Goods",
+        "quantity":10,
+        "urgency":"low",
+        "needed_by":datetime.utcnow() + timedelta(days=7),
+        "is_recurring":True,
+        "notes":"Needed for weekly distribution"
+    },
+    {
+        "title":"Bread for lunch service",
+        "requested_item":"Bread",
+        "category":"Baked Goods",
+        "quantity":2,
+        "urgency":"high",
+        "needed_by":datetime.utcnow() + timedelta(hours=12),
+        "is_recurring":False,
+        "notes":"Urgent - lunch service"
     }
 ]
 
