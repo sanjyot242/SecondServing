@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field
-from typing import Literal, Optional
+from pydantic import BaseModel, Field, conint
+from typing import Literal, Optional, Annotated
 from datetime import datetime
 from enum import Enum
 
@@ -92,3 +92,16 @@ class RequestOut(RequestCreate):
         "from_attributes": True,
         "populate_by_name": True
     }
+
+#--------------------- Feedback ---------------------
+class FeedbackCreate(BaseModel):
+    request_id: int
+    rating: Annotated[int, conint(ge=1, le=5)]  # 1 to 5
+    comments: Optional[str] = None
+
+class FeedbackOut(FeedbackCreate):
+    id: int
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
