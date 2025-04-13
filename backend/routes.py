@@ -148,16 +148,3 @@ def get_recommended_food(
     except Exception as exc:
         logger.error(f"An unexpected error occurred: {exc}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
-
-
-####################### FEEDBACK ENDPOINTS #######################
-@app_router.post("/feedback", response_model=FeedbackOut)
-def leave_feedback(
-    feedback_data: FeedbackCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    if current_user.role != "receiver":
-        raise HTTPException(status_code=403, detail="Only receivers can leave feedback")
-
-    return submit_feedback(db, current_user.id, feedback_data)

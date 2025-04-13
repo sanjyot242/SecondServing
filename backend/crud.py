@@ -77,28 +77,3 @@ def create_request(db: Session, receiver_id: int, request_data: RequestCreate):
     db.commit()
     db.refresh(new_request)
     return new_request
-
-def submit_feedback(db: Session, receiver_id: int, feedback_data: FeedbackCreate):
-    request = db.query(Request).filter(Request.id == feedback_data.request_id).first()
-
-    if not request:
-        raise HTTPException(status_code=404, detail="Request not found")
-
-    if request.receiver_id != receiver_id:
-        raise HTTPException(status_code=403, detail="You are not the owner of this request")
-
-    if request.status != "fulfilled":
-        raise HTTPException(status_code=400, detail="Feedback can only be submitted for fulfilled requests")
-
-    if request.feedback:
-        raise HTTPException(status_code=400, detail="Feedback already submitted for this request")
-
-    new_feedback = Feedback(
-        request_id=feedback_data.request_id,
-        rating=feedback_data.rating,
-        comments=feedback_data.comments
-    )
-    db.add(new_feedback)
-    db.commit()
-    db.refresh(new_feedback)
-    return new_feedback

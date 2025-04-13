@@ -82,15 +82,3 @@ class RequestOut(RequestCreate):
 
     class Config:
         orm_mode = True
-
-class FeedbackCreate(BaseModel):
-    request_id: int
-    rating: Annotated[int, conint(ge=1, le=5)]  # 1 to 5
-    comments: Optional[str] = None
-
-class FeedbackOut(FeedbackCreate):
-    id: int
-    created_at: datetime
-
-    class Config:
-        orm_mode = True
