@@ -16,7 +16,8 @@ const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
     location: '',
     volunteerEmails: [''],
     password: '',
-    contactNumber: ''
+    contactNumber: '',
+    role: 'receiver'
   });
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);

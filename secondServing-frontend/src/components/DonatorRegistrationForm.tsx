@@ -17,7 +17,8 @@ const DonatorRegistrationForm: React.FC<DonatorRegistrationFormProps> = ({
     type: '',
     contactInfo: '',
     password: '',
-    email: ''
+    email: '',
+    role: 'donor'
   });
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
