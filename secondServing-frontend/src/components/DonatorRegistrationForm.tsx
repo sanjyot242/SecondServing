@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { DonatorData } from '../types';
 import { useAuth } from '../context/AuthContext';
-import { motion } from 'framer-motion';
 
 const DonatorRegistrationForm: React.FC = () => {
   const navigate = useNavigate();
@@ -50,17 +49,7 @@ const DonatorRegistrationForm: React.FC = () => {
   };
 
   return (
-    <motion.div
-      initial={{ x: '100%' }}  // Start off-screen to the right
-      animate={{ x: 0 }}       // Animate to center position
-      exit={{ x: '-100%' }}     // Move to the left (off-screen) when navigating away
-      transition={{ 
-        type: 'spring', 
-        stiffness: 100, 
-        damping: 25, 
-        duration: 1
-      }}
-    >
+
       <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-8 space-container">
         <div className="max-w-4xl w-full backdrop-blur-md bg-white/30 rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
@@ -221,7 +210,6 @@ const DonatorRegistrationForm: React.FC = () => {
           </div>
         </div>
       </div>
-    </motion.div>
   );
 };
 

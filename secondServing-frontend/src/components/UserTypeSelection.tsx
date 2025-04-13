@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserType } from '../types';
-import { motion } from 'framer-motion';
 import '../styles/spaceTheme.css';
 
 const UserTypeSelection: React.FC = () => {
@@ -16,18 +15,7 @@ const UserTypeSelection: React.FC = () => {
   };
 
   return (
-    <motion.div
-      className='space-container'
-      initial={{ x: '100%' }}   // Start off-screen to the right
-      animate={{ x: 0 }}        // End at default position (0, center)
-      exit={{ x: '-100%' }}      // Move to the left (off-screen) when navigating away
-      transition={{ 
-        type: 'spring', 
-        stiffness: 100, 
-        damping: 25, 
-        duration: 1
-      }} 
-    >
+    <div className="space-container">
       <div className="min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center p-4">
         <div className="max-w-md w-full backdrop-blur-md bg-white/30 rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
@@ -65,7 +53,7 @@ const UserTypeSelection: React.FC = () => {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
