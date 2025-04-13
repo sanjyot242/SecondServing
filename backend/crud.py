@@ -2,7 +2,6 @@
 from datetime import datetime
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from fastapi import HTTPException
 from models import UserCreate, FoodItemCreate, RequestCreate
 from schema import User, FoodItem, Request
 

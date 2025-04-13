@@ -148,4 +148,3 @@ def get_recommended_food(
     except Exception as exc:
         logger.error(f"An unexpected error occurred: {exc}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
-    
