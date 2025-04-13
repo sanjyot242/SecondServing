@@ -14,11 +14,12 @@ const StatusCard: React.FC<StatusCardProps> = ({
   userType,
   icon = 'clipboard',
 }) => {
-  const bgColor = userType === 'shelter' ? 'bg-shelter-dark' : 'bg-donor-dark';
+  const bgColorClass =
+    userType === 'shelter' ? 'bg-shelter-dark' : 'bg-donor-dark';
 
   return (
     <div
-      className={`${bgColor} rounded-lg p-4 text-white flex items-center space-x-4`}>
+      className={`${bgColorClass} rounded-lg p-4 text-white flex items-center space-x-4 hover-orbit`}>
       <div className='p-3 bg-white bg-opacity-10 rounded-full'>
         {icon === 'calendar' ? (
           <HiOutlineCalendar className='w-6 h-6 text-white' />

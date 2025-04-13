@@ -12,7 +12,8 @@ interface InventoryTableProps {
 }
 
 const InventoryTable: React.FC<InventoryTableProps> = ({ items }) => {
-  const getConditionClass = (condition: string) => {
+  // Get appropriate CSS class based on condition
+  const getConditionClass = (condition: 'Critical' | 'Good' | 'Waste') => {
     switch (condition) {
       case 'Critical':
         return 'bg-cosmos-mars text-white';
@@ -25,11 +26,13 @@ const InventoryTable: React.FC<InventoryTableProps> = ({ items }) => {
     }
   };
 
+  // Get appropriate CSS class based on tag type
   const getTagClass = (tag: string) => {
     if (tag.includes('Gluten')) return 'bg-cosmos-jupiter text-cosmos-void';
     if (tag.includes('Vegan')) return 'bg-shelter-secondary text-cosmos-void';
     if (tag.includes('Vegetarian')) return 'bg-cosmos-comet text-white';
     if (tag.includes('Kosher')) return 'bg-donor-secondary text-cosmos-void';
+    if (tag.includes('Probiotic')) return 'bg-cosmos-satellite text-white';
     return 'bg-cosmos-orbit text-white';
   };
 
@@ -56,7 +59,13 @@ const InventoryTable: React.FC<InventoryTableProps> = ({ items }) => {
           </thead>
           <tbody>
             {items.map((item, index) => (
-              <tr key={index} className='border-b border-cosmos-stardust'>
+              <tr
+                key={index}
+                className={`border-b border-cosmos-stardust ${
+                  index % 2 === 0
+                    ? 'bg-cosmos-nebula'
+                    : 'bg-cosmos-stardust bg-opacity-10'
+                }`}>
                 <td className='py-3 font-space text-white'>{item.name}</td>
                 <td className='py-3 font-space text-cosmos-station-base'>
                   {item.type}
