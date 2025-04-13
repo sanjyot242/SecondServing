@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TabNav from './TabNav';
 import RequestCard from './RequestCard';
+import { useAuth } from '../context/AuthContext';
 
 // Sample request data
 const SAMPLE_REQUESTS = [
@@ -45,6 +46,10 @@ const SAMPLE_REQUESTS = [
 ];
 
 const ViewRequestsPage: React.FC = () => {
+  const { userType } = useAuth();
+
+  // Default to 'shelter' if userType is null
+  const userTypeValue = userType || 'shelter';
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('All');
 
@@ -93,7 +98,7 @@ const ViewRequestsPage: React.FC = () => {
               status={request.status}
               items={request.items}
               notes={request.notes}
-              userType='shelter'
+              userType={userTypeValue}
               onViewDetails={() =>
                 navigate(`/dashboard/requests/${request.id}`)
               }
