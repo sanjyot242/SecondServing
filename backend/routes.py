@@ -7,9 +7,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from config.logging_config import get_logger
 from config.database import get_db
-from models import UserCreate, Token, FoodItemCreate, FoodItemOut, RequestOut, RequestCreate, FeedbackOut, FeedbackCreate
+from models import UserCreate, Token, FoodItemCreate, FoodItemOut, RequestOut, RequestCreate, FeedbackOut, FeedbackCreate, ShelterRequestOut
 from schema import User
-from crud import create_user, get_user_by_email, create_new_food_item, get_active_inventory, create_request, match_requests_to_food_items, mark_expired_food_items_as_fulfilled, mark_food_as_fulfilled, submit_feedback
+from crud import create_user, get_user_by_email, create_new_food_item, get_active_inventory, create_request, match_requests_to_food_items, mark_expired_food_items_as_fulfilled, mark_food_as_fulfilled, submit_feedback, get_requests_for_receiver
 from auth import authenticate_user, create_access_token, get_current_user, set_auth_cookie, get_password_hash
 from fastapi.responses import JSONResponse
 
@@ -197,3 +197,14 @@ def leave_feedback(
         raise HTTPException(status_code=403, detail="Only receivers can leave feedback")
 
     return submit_feedback(db, current_user.id, feedback_data)
+
+
+@app_router.get("/receiver/requests", response_model=List[ShelterRequestOut])
+def get_receiver_requests(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "receiver":
+        raise HTTPException(status_code=403, detail="Only receivers can view their requests")
+    
+    return get_requests_for_receiver(db, current_user.id)

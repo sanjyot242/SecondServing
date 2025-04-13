@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiOutlineArrowLeft } from 'react-icons/hi';
+import axios from 'axios';
 
 interface StockItem {
-  name: string;
-  type: string;
+  title: string;
+  description?: string;
+  category: string;
   quantity: number;
-  unit: string;
-  condition: 'Critical' | 'Good' | 'Waste';
-  tags: string[];
+  expiry: string;
+  available_from?: string;
+  available_until?: string;
+  pickupLocation: string;
 }
 
 interface AddStockPageProps {
@@ -17,14 +20,17 @@ interface AddStockPageProps {
 
 const AddStockPage: React.FC<AddStockPageProps> = ({ onAddStock }) => {
   const navigate = useNavigate();
+  const API_URL = 'http://localhost:8080';
 
   const [stockItem, setStockItem] = useState<StockItem>({
-    name: '',
-    type: 'Produce',
+    title: '',
+    description: '',
+    category: 'Produce',
     quantity: 1,
-    unit: 'units',
-    condition: 'Good',
-    tags: [],
+    expiry: '',
+    available_from: '',
+    available_until: '',
+    pickupLocation: '',
   });
 
   const [availableTags, setAvailableTags] = useState([
@@ -46,27 +52,26 @@ const AddStockPage: React.FC<AddStockPageProps> = ({ onAddStock }) => {
     }));
   };
 
-  const handleTagToggle = (tag: string) => {
-    setStockItem((prev) => {
-      if (prev.tags.includes(tag)) {
-        return { ...prev, tags: prev.tags.filter((t) => t !== tag) };
-      } else {
-        return { ...prev, tags: [...prev.tags, tag] };
-      }
-    });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await addFoodItem(stockItem); // will throw if failed
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Error adding food item:', err);
+      // Optional: add a toast or message to user
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // If onAddStock callback provided, call it with the current stock item
-    if (onAddStock) {
-      onAddStock(stockItem);
+  const addFoodItem = async (foodData: StockItem) => {
+    try {
+      const response = await axios.post(`${API_URL}/add-food`, foodData, {
+        withCredentials: true,
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
     }
-
-    // For demo purposes, let's just log the item and navigate back
-    console.log('Added stock item:', stockItem);
-    navigate('/dashboard');
   };
 
   return (
@@ -85,11 +90,10 @@ const AddStockPage: React.FC<AddStockPageProps> = ({ onAddStock }) => {
           <div>
             <label className='space-label block mb-1'>Item Name*</label>
             <input
-              type='text'
-              name='name'
-              value={stockItem.name}
+              type="text"
+              name="title"
+              value={stockItem.title}
               onChange={handleChange}
-              className='space-input w-full'
               required
             />
           </div>
@@ -97,17 +101,20 @@ const AddStockPage: React.FC<AddStockPageProps> = ({ onAddStock }) => {
           <div>
             <label className='space-label block mb-1'>Food Type*</label>
             <select
-              name='type'
-              value={stockItem.type}
+              name="category"
+              value={stockItem.category}
               onChange={handleChange}
-              className='space-input w-full'
-              required>
+            >
               <option>Produce</option>
+              <option>Dairy</option>
+              <option>Meat</option>
               <option>Baked Goods</option>
               <option>Canned Goods</option>
-              <option>Dairy</option>
-              <option>Grains</option>
               <option>Dry Goods</option>
+              <option>Beverages</option>
+              <option>Frozen Foods</option>
+              <option>Prepared Foods</option>
+              <option>Others</option>
             </select>
           </div>
 
@@ -125,54 +132,42 @@ const AddStockPage: React.FC<AddStockPageProps> = ({ onAddStock }) => {
           </div>
 
           <div>
-            <label className='space-label block mb-1'>Unit</label>
-            <select
-              name='unit'
-              value={stockItem.unit}
+            <label className='space-label block mb-1'>Expiry*</label>
+            <input
+              type="datetime-local"
+              name="expiry"
+              value={stockItem.expiry}
               onChange={handleChange}
-              className='space-input w-full'>
-              <option>units</option>
-              <option>lbs</option>
-              <option>kg</option>
-              <option>gallons</option>
-              <option>liters</option>
-              <option>boxes</option>
-              <option>cans</option>
-              <option>loaves</option>
-              <option>pieces</option>
-            </select>
-          </div>
+              required
+            />
 
-          <div>
-            <label className='space-label block mb-1'>Condition</label>
-            <select
-              name='condition'
-              value={stockItem.condition}
+            {/* Available From */}
+            <label className='space-label block mb-1'>Available From*</label>
+            <input
+              type="datetime-local"
+              name="available_from"
+              value={stockItem.available_from}
               onChange={handleChange}
-              className='space-input w-full'>
-              <option value='Good'>Good</option>
-              <option value='Critical'>Critical</option>
-              <option value='Waste'>Waste</option>
-            </select>
-          </div>
-        </div>
+            />
 
-        <div className='mb-8'>
-          <label className='space-label block mb-2'>Restriction Tags</label>
-          <div className='flex flex-wrap gap-2'>
-            {availableTags.map((tag) => (
-              <button
-                key={tag}
-                type='button'
-                onClick={() => handleTagToggle(tag)}
-                className={`px-3 py-1 rounded-full text-sm font-space transition-colors ${
-                  stockItem.tags.includes(tag)
-                    ? 'bg-cosmos-orbit text-white'
-                    : 'bg-cosmos-stardust text-cosmos-station-base hover:bg-opacity-70'
-                }`}>
-                {tag}
-              </button>
-            ))}
+            {/* Available Until */}
+            <label className='space-label block mb-1'>Available Until*</label>
+            <input
+              type="datetime-local"
+              name="available_until"
+              value={stockItem.available_until}
+              onChange={handleChange}
+            />
+
+            {/* Pickup Location */}
+            <label className='space-label block mb-1'>Pickup Location*</label>
+            <input
+              type="text"
+              name="pickupLocation"
+              value={stockItem.pickupLocation}
+              onChange={handleChange}
+              required
+            />
           </div>
         </div>
 

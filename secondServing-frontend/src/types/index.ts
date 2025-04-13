@@ -1,6 +1,7 @@
 export interface ShelterData {
     name: string;
     location: string;
+    type: string; // shelter, food bank, etc.
     email:string
     password: string;
     contactInfo: string;

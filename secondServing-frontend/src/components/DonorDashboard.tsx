@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import UserWelcomeCard from './UserWelcomeCard';
 import StatusCard from './StatusCard';
 import ActionButton from './ActionButton';
 import InventoryTable from './InventoryTable';
+import axios from 'axios';
 
 // Sample inventory data
 const SAMPLE_INVENTORY = [
@@ -72,8 +73,18 @@ const SAMPLE_INVENTORY = [
 
 const DonorDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const API_URL = 'http://localhost:8080';
   const { user } = useAuth();
   const userName = user?.email?.split('@')[0] || 'User';
+  const [inventory, setInventory] = useState([]);
+  useEffect(() => {
+    fetchActiveInventory().then(setInventory).catch(console.error);
+  }, [location.pathname]);
+
+  const fetchActiveInventory = async () => {
+    const response = await axios.get(`${API_URL}/inventory/active`, { withCredentials: true });
+    return response.data.inventory;
+  };
 
   return (
     <>
@@ -104,7 +115,7 @@ const DonorDashboard: React.FC = () => {
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
         <div className='lg:col-span-2'>
-          <InventoryTable items={SAMPLE_INVENTORY} />
+        <InventoryTable items={inventory} />
         </div>
       </div>
     </>

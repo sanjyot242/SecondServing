@@ -103,8 +103,8 @@ def match_requests_to_food_items(db: Session):
             )
         )
 
-        if req.needed_by:
-            query = query.filter(FoodItem.expiry >= req.needed_by)
+        # if req.needed_by:
+        #     query = query.filter(FoodItem.expiry >= req.needed_by)
 
         match = query.first()
 
@@ -223,3 +223,26 @@ def submit_feedback(db: Session, receiver_id: int, feedback_data: FeedbackCreate
     db.commit()
     db.refresh(new_feedback)
     return new_feedback
+
+
+def get_requests_for_receiver(db: Session, receiver_id: int):
+    requests = db.query(Request).filter(Request.receiver_id == receiver_id).all()
+
+    results = []
+    for req in requests:
+        results.append({
+            "id": req.id,
+            "title": req.title,
+            "created_at": req.created_at,
+            "urgency": req.urgency.capitalize(),
+            "status": req.status.capitalize(),
+            "notes": req.notes,
+            "items": [{
+                "name": req.requested_item,
+                "category": req.category,
+                "quantity": req.quantity,
+                "unit": "units"
+            }]
+        })
+
+    return results

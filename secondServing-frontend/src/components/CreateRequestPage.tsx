@@ -5,6 +5,7 @@ import {
   HiOutlinePlus,
   HiOutlineTrash,
 } from 'react-icons/hi';
+import axios from 'axios';
 
 interface RequestItem {
   id: string;
@@ -23,6 +24,7 @@ interface RequestFormData {
 
 const CreateRequestPage: React.FC = () => {
   const navigate = useNavigate();
+  const API_URL = 'http://localhost:8080';
 
   const [formData, setFormData] = useState<RequestFormData>({
     title: '',
@@ -81,12 +83,36 @@ const CreateRequestPage: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const mapUrgency = (value: string): "low" | "medium" | "high" => {
+    if (value.toLowerCase().includes("high")) return "high";
+    if (value.toLowerCase().includes("medium")) return "medium";
+    return "low";
+  };
 
-    // For demo purposes, let's just log the request and navigate back
-    console.log('Created request:', formData);
-    navigate('/dashboard');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+  
+    const item = formData.items[0]; // Only use the first item for MVP
+  
+    const payload = {
+      title: formData.title,
+      requested_item: item.name,
+      category: item.category,
+      quantity: item.quantity,
+      urgency: mapUrgency(formData.urgency),
+      needed_by: null, // optionally add this later
+      is_recurring: false,
+      notes: formData.notes,
+    };
+  
+    try {
+      await axios.post(`${API_URL}/requests`, payload, { withCredentials: true });
+      console.log('Request submitted:', payload);
+      navigate('/dashboard');
+    } catch (err: any) {
+      console.error('Error submitting request:', err);
+      // Optionally show a toast or error UI
+    }
   };
 
   return (

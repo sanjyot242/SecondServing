@@ -11,6 +11,7 @@ const ShelterRegistrationForm: React.FC = () => {
   const [formData, setFormData] = useState<ShelterData>({
     name: '',
     location: '',
+    type: '',
     email: '',
     password: '',
     contactInfo: '',
@@ -20,7 +21,9 @@ const ShelterRegistrationForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -103,6 +106,29 @@ const ShelterRegistrationForm: React.FC = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 shelter-input placeholder-gray-500"
                 placeholder="Full address"
               />
+            </div>
+
+            {/* Shelter Type */}
+            <div>
+              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+                Type of Shelter
+              </label>
+              <select
+                id="type"
+                name="type"
+                required
+                value={formData.type}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 shelter-input"
+              >
+                <option value="">Select type</option>
+                <option value="temple">Temple</option>
+                <option value="school">School</option>
+                <option value="community_center">Community Center</option>
+                <option value="orphanage">Orphanage</option>
+                <option value="ngo">NGO</option>
+                <option value="others">Others</option>
+              </select>
             </div>
 
             {/* Email */}

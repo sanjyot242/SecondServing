@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, conint
-from typing import Literal, Optional, Annotated
+from typing import Literal, Optional, Annotated, List
 from datetime import datetime
 from enum import Enum
 
@@ -105,3 +105,22 @@ class FeedbackOut(FeedbackCreate):
 
     class Config:
         orm_mode = True
+
+
+class RequestItemOut(BaseModel):
+    name: str
+    category: FoodCategory
+    quantity: int
+    unit: str
+
+class ShelterRequestOut(BaseModel):
+    id: int
+    title: str
+    created_at: datetime
+    urgency: str
+    status: str
+    notes: Optional[str] = None
+    items: List[RequestItemOut]
+
+    class Config:
+        from_attributes = True
