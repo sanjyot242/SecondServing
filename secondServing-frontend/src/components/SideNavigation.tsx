@@ -11,39 +11,42 @@ interface NavItemProps {
   onClick?: () => void;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ to, icon, label, badge, onClick }) => {
-  return (
-    <li className="mb-2">
-      <NavLink
-        to={to}
-        onClick={onClick}
-        className={({ isActive }) =>
-          `flex items-center w-full py-3 px-4 rounded-lg text-left transition-all ${
-            isActive ? 'bg-cosmos-stardust bg-opacity-20' : 'hover:bg-cosmos-stardust hover:bg-opacity-10'
-          }`
-        }
-      >
-        <span className="w-5 h-5 mr-3 text-white">{icon}</span>
-        {/* Show label if sidebar is expanded */}
-        <span className="font-space text-white">{label}</span>
-        {badge !== undefined && (
-          <span className="ml-auto bg-cosmos-orbit text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-            {badge}
-          </span>
-        )}
-      </NavLink>
-    </li>
-  );
-};
+
 
 interface SideNavigationProps {
   userType: 'shelter' | 'donator';
 }
 
 const SideNavigation: React.FC<SideNavigationProps> = ({ userType }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);  // For handling sidebar collapse/expand
+  // Properly initialize isSidebarOpen state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar will be open by default
   const navigate = useNavigate();
   const { logout } = useAuth();
+
+  const NavItem: React.FC<NavItemProps> = ({ to, icon, label, badge, onClick }) => {
+    return (
+      <li className="mb-2">
+        <NavLink
+          to={to}
+          onClick={onClick}
+          className={({ isActive }) =>
+            `flex items-center w-full py-3 px-4 rounded-lg text-left transition-all ${
+              isActive ? 'bg-cosmos-stardust bg-opacity-20' : 'hover:bg-cosmos-stardust hover:bg-opacity-10'
+            }`
+          }
+        >
+          <span className="w-5 h-5 mr-3 text-white">{icon}</span>
+          {/* Show label if sidebar is expanded */}
+          {isSidebarOpen && <span className="font-space text-white">{label}</span>}
+          {badge !== undefined && (
+            <span className="ml-auto bg-cosmos-orbit text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {badge}
+            </span>
+          )}
+        </NavLink>
+      </li>
+    );
+  };
 
   const handleLogout = async () => {
     try {
