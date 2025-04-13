@@ -1,7 +1,7 @@
 #For type verification using pydantic
 
-from pydantic import BaseModel, Field
-from typing import Literal, Optional
+from pydantic import BaseModel, Field, conint
+from typing import Literal, Optional, Annotated
 from datetime import datetime
 
 from enum import Enum
@@ -78,6 +78,18 @@ class RequestCreate(BaseModel):
 class RequestOut(RequestCreate):
     id: int
     status: str
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+class FeedbackCreate(BaseModel):
+    request_id: int
+    rating: Annotated[int, conint(ge=1, le=5)]  # 1 to 5
+    comments: Optional[str] = None
+
+class FeedbackOut(FeedbackCreate):
+    id: int
     created_at: datetime
 
     class Config:

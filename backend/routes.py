@@ -7,9 +7,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from config.logging_config import get_logger
 from config.database import get_db
-from models import UserCreate, Token, FoodItemCreate, FoodItemOut, RequestOut, RequestCreate
+from models import UserCreate, Token, FoodItemCreate, FoodItemOut, RequestOut, RequestCreate, FeedbackCreate, FeedbackOut
 from schema import User
-from crud import create_user, get_user_by_email, create_new_food_item, get_available_food_items, create_request
+from crud import create_user, get_user_by_email, create_new_food_item, get_available_food_items, create_request, submit_feedback
 from auth import authenticate_user, create_access_token, get_current_user, set_auth_cookie, get_password_hash
 from fastapi.responses import JSONResponse
 
@@ -148,3 +148,16 @@ def get_recommended_food(
     except Exception as exc:
         logger.error(f"An unexpected error occurred: {exc}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
+
+
+####################### FEEDBACK ENDPOINTS #######################
+@app_router.post("/feedback", response_model=FeedbackOut)
+def leave_feedback(
+    feedback_data: FeedbackCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "receiver":
+        raise HTTPException(status_code=403, detail="Only receivers can leave feedback")
+
+    return submit_feedback(db, current_user.id, feedback_data)
