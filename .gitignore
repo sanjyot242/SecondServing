@@ -1,2 +1,11 @@
 # Node.js dependencies
 node_modules/
+
+
+
+#Backend
+.env
+__pycache__/
+.venv
+*.log
+logs/
