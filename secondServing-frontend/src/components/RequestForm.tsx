@@ -12,7 +12,7 @@ interface RequestFormItem {
 interface RequestFormProps {
   onSubmit: (data: any) => void;
   onCancel: () => void;
-  userType: 'shelter' | 'donor';
+  userType: 'shelter' | 'donator';
 }
 
 const RequestForm: React.FC<RequestFormProps> = ({

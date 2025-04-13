@@ -82,19 +82,21 @@ const DonorDashboard: React.FC = () => {
   }, [location.pathname]);
 
   const fetchActiveInventory = async () => {
-    const response = await axios.get(`${API_URL}/inventory/active`, { withCredentials: true });
+    const response = await axios.get(`${API_URL}/inventory/active`, {
+      withCredentials: true,
+    });
     return response.data.inventory;
   };
 
   return (
     <>
-      <UserWelcomeCard name={userName} userType='shelter' />
+      <UserWelcomeCard name={userName} userType='donator' />
 
       <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
         <StatusCard
           title='Upcoming Deliveries'
           count={3}
-          userType='shelter'
+          userType='donator'
           icon='calendar'
         />
 
@@ -102,20 +104,20 @@ const DonorDashboard: React.FC = () => {
           label='Add Stock'
           icon='plus'
           onClick={() => navigate('/dashboard/add-stock')}
-          userType='shelter'
+          userType='donator'
         />
 
         <ActionButton
           label='NeedMap'
           icon='map'
           onClick={() => console.log('NeedMap clicked')}
-          userType='shelter'
+          userType='donator'
         />
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
         <div className='lg:col-span-2'>
-        <InventoryTable items={inventory} />
+          <InventoryTable items={inventory} />
         </div>
       </div>
     </>

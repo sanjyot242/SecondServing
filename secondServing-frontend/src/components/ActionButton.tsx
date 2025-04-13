@@ -5,7 +5,7 @@ interface ActionButtonProps {
   label: string;
   icon: 'plus' | 'map';
   onClick: () => void;
-  userType: 'shelter' | 'donor';
+  userType: 'shelter' | 'donator';
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({

@@ -2,7 +2,7 @@ import React from 'react';
 
 interface UserWelcomeCardProps {
   name: string;
-  userType: 'shelter' | 'donor';
+  userType: 'shelter' | 'donator';
 }
 
 const UserWelcomeCard: React.FC<UserWelcomeCardProps> = ({
