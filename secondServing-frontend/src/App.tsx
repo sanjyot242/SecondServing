@@ -12,8 +12,6 @@ import DonatorRegistrationForm from './components/DonatorRegistrationForm';
 import LoginForm from './components/LoginForm';
 import DashboardRouter from './components/DashboardRouter'; // Import the new DashboardRouter
 import ProtectedRoute from './components/ProtectedRoute';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LandingPage from './components/LandingPage';
 
@@ -31,10 +29,7 @@ const AppContent: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
-  // Add this to ensure navbar and footer consistency
-  const showNavbarAndFooter =
-    isAuthenticated && location.pathname.startsWith('/dashboard');
-
+  // Check if the user is authenticated for specific routes like /dashboard
   if (isLoading) {
     return (
       <div className='min-h-screen bg-gray-100 flex items-center justify-center'>
@@ -47,9 +42,6 @@ const AppContent: React.FC = () => {
 
   return (
     <div className='app'>
-      {/* Only show navbar and footer when authenticated and on dashboard */}
-      {showNavbarAndFooter && <Navbar />}
-
       <Routes>
         {/* Landing page route */}
         <Route
@@ -120,9 +112,6 @@ const AppContent: React.FC = () => {
         {/* Fallback route */}
         <Route path='*' element={<Navigate to='/' replace />} />
       </Routes>
-
-      {/* Footer only shows when navbar shows */}
-      {showNavbarAndFooter && <Footer />}
     </div>
   );
 };
