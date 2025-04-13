@@ -14,6 +14,9 @@ const LoginForm: React.FC = () => {
   const [error, setError] = useState('');
   const [localUserType, setLocalUserType] = useState<UserType>(userType || 'shelter');
 
+  // Get the return path from location state if it exists
+  const from = (location.state as any)?.from?.pathname || "/dashboard";
+
   // Update userType from query params if present
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -32,7 +35,8 @@ const LoginForm: React.FC = () => {
     
     try {
       await login(email, password);
-      navigate('/dashboard');
+      // Redirect to the intended destination or dashboard
+      navigate(from, { replace: true });
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Login failed. Please check your credentials.');
     } finally {

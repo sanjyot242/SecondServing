@@ -18,6 +18,7 @@ interface AuthContextType {
   registerShelter: (data: ShelterData) => Promise<void>;
   registerDonator: (data: DonatorData) => Promise<void>;
   setUserType: (type: UserType) => void;
+  checkAuthStatus: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,7 +40,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-  // Check authentication status
+  // Initial auth check
   useEffect(() => {
     const checkAuth = async () => {
       setIsLoading(true);
@@ -64,21 +65,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
-  const handleLogin = async (email: string, password: string) => {
-    setIsLoading(true);
+  // Reusable function to check authentication status
+  const checkAuthStatus = async (): Promise<boolean> => {
     try {
-      await login(email, password);
       const userData = await getCurrentUser();
       setUser(userData);
       
       // Set user type based on role
       if (userData.role === 'provider') {
         setUserType('donator');
-        localStorage.setItem('userType', 'donator');
       } else if (userData.role === 'receiver') {
         setUserType('shelter');
-        localStorage.setItem('userType', 'shelter');
       }
+      
+      return true;
+    } catch (error) {
+      // Not authenticated
+      setUser(null);
+      return false;
+    }
+  };
+
+  const handleLogin = async (email: string, password: string) => {
+    setIsLoading(true);
+    try {
+      await login(email, password);
+      await checkAuthStatus();
     } catch (error) {
       throw error;
     } finally {
@@ -90,10 +102,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       await registerShelter(data);
-      const userData = await getCurrentUser();
-      setUser(userData);
-      setUserType('shelter');
-      localStorage.setItem('userType', 'shelter');
+      await checkAuthStatus();
     } catch (error) {
       throw error;
     } finally {
@@ -105,10 +114,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       await registerDonator(data);
-      const userData = await getCurrentUser();
-      setUser(userData);
-      setUserType('donator');
-      localStorage.setItem('userType', 'donator');
+      await checkAuthStatus();
     } catch (error) {
       throw error;
     } finally {
@@ -144,6 +150,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     registerShelter: handleRegisterShelter,
     registerDonator: handleRegisterDonator,
     setUserType: handleSetUserType,
+    checkAuthStatus,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
