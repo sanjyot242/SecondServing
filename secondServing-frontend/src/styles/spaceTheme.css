@@ -33,8 +33,8 @@
 }
 
 .space-button-primary {
-  @apply font-future bg-cosmos-orbit text-white py-3 px-6 rounded-capsule 
-    shadow-orbit hover:bg-opacity-90 transition-all duration-300 uppercase tracking-wider;
+  @apply font-future bg-teal-600 text-white py-3 px-6 rounded-capsule 
+    shadow-orbit hover:bg-teal-700 hover:bg-opacity-90 transition-all duration-300 uppercase tracking-wider;
 }
 
 .space-button-secondary {

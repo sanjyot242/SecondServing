@@ -7,7 +7,7 @@ interface ShelterRegistrationFormProps {
   switchToLogin: () => void;
 }
 
-const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({ 
+const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
   onRegistrationSuccess,
   switchToLogin
 }) => {
@@ -50,7 +50,7 @@ const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -58,7 +58,7 @@ const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
 
     setIsLoading(true);
     setError('');
-    
+
     try {
       await registerShelter(formData);
       onRegistrationSuccess();
@@ -70,19 +70,19 @@ const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-8 space-container">
+      <div className="max-w-md w-full backdrop-blur-md bg-white/30 rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Register as a Shelter</h1>
-          <p className="text-gray-600 mt-2">Join SecondServing to receive food donations</p>
+          <h1 className="text-3xl font-bold text-gray-800 space-header">Register as a Shelter</h1>
+          <p className="text-gray-600 mt-2 space-subheader">Join SecondServing to receive food donations</p>
         </div>
-        
+
         {error && (
           <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
             {error}
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -95,10 +95,10 @@ const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
               required
               value={formData.name}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 shelter-input"
             />
           </div>
-          
+
           <div>
             <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
               Location
@@ -110,11 +110,12 @@ const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
               required
               value={formData.location}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 shelter-input placeholder-gray-500"
+
               placeholder="Full address"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Volunteer Emails
@@ -125,7 +126,7 @@ const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
                   type="email"
                   value={email}
                   onChange={(e) => handleVolunteerEmailChange(index, e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 shelter-input placeholder-gray-500"
                   placeholder="volunteer@example.com"
                 />
                 <button
@@ -141,12 +142,12 @@ const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
             <button
               type="button"
               onClick={addVolunteerEmail}
-              className="text-sm text-teal-600 hover:text-teal-800"
+              className="text-sm text-teal-800 hover:text-teal-900"
             >
               + Add another email
             </button>
           </div>
-          
+
           <div>
             <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-700 mb-1">
               Contact Number
@@ -158,10 +159,10 @@ const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
               required
               value={formData.contactNumber}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 shelter-input"
             />
           </div>
-          
+
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Password
@@ -173,11 +174,11 @@ const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
               required
               value={formData.password}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 shelter-input"
               minLength={8}
             />
           </div>
-          
+
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
               Confirm Password
@@ -188,26 +189,26 @@ const ShelterRegistrationForm: React.FC<ShelterRegistrationFormProps> = ({
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 shelter-input"
               minLength={8}
             />
           </div>
-          
+
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition duration-150 disabled:bg-gray-400"
+            className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition duration-150 disabled:bg-gray-400 glow-effect space-button-ghost"
           >
             {isLoading ? 'Registering...' : 'Register'}
           </button>
         </form>
-        
+
         <div className="mt-4 text-center">
-          <p className="text-gray-600">
+          <p className="text-gray-700">
             Already have an account?{' '}
-            <button 
+            <button
               onClick={switchToLogin}
-              className="text-teal-600 hover:text-teal-800 font-medium"
+              className="text-teal-800 hover:text-teal-900 font-medium"
             >
               Sign in
             </button>
