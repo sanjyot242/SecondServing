@@ -8,7 +8,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from config.database import get_db
 from crud import get_user_by_email
-from config import settings
+from config.settings import settings
 from schema import User
 from models import TokenData
 from config.logging_config import get_logger
@@ -72,7 +72,7 @@ def authenticate_user(db: Session, email: str, password: str):
     if not auth_info:
         logger.warning(f"Authentication failed: User with email {email} not found")
         return False
-    if not verify_password(password, auth_info.hashed_password):
+    if not verify_password(password, auth_info.password_hash):
         logger.warning(f"Authentication failed: Incorrect password for email {email}")
         return False
     logger.info(f"User with email {email} authenticated successfully")

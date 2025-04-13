@@ -67,7 +67,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     
     response = JSONResponse(content={
         "user_id": auth_info.id,
-        "is_onboarded": auth_info.is_onboarded
+        "role": auth_info.role
     })
     set_auth_cookie(response, access_token, user.role)
     
